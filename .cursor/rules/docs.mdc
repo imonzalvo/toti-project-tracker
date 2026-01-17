@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+
+- Siempre que hagas un cambio que modifique la logica de negocio, actualiza el archivo docs/PRD.md
+- Siempre que hagas un cambio que haga un cambio conceptual en una vista, actualiza el archivo docs/PRD-UX.md

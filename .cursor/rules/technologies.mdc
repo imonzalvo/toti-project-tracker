@@ -1,0 +1,10 @@
+---
+name: technologies
+description: This is a new rule
+---
+
+# Overview
+
+This rule specifies which libs we must use when possible:
+
+- Always use shadcn for components

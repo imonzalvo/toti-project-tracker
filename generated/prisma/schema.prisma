@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Roles de usuario
+// ADMIN = Puede crear, modificar y eliminar recursos y usuarios
+// GUEST = Solo puede ver recursos
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String // Hashed password
+  name      String
+  role      String   @default("GUEST") // ADMIN, GUEST
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+
+// Estado operativo del proyecto
+// NOT_STARTED = No comenzó
+// IN_PROGRESS = Comenzó
+// FINISHED = Finalizó
+// Moneda del proyecto
+// UYU = Pesos Uruguayos
+// USD = Dólares Americanos
+model Proyecto {
+  id            String   @id @default(cuid())
+  identificador String   @unique
+  nombre        String
+  montoTotal    Float
+  comisionPct   Float
+  estado        String   @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, FINISHED
+  moneda        String   @default("USD") // UYU, USD
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  facturaciones Facturacion[]
+
+  @@index([identificador])
+  @@index([estado])
+  @@index([moneda])
+}
+
+// Estado de la facturación
+// EMITIDA = Factura emitida, pendiente de cobro
+// COBRADA = Factura cobrada
+model Facturacion {
+  id               String    @id @default(cuid())
+  proyectoId       String
+  descripcion      String // APROBACION, ENTREGA_PARCIAL, ENTREGA_TOTAL
+  porcentaje       Float // Porcentaje del monto total del proyecto
+  monto            Float // Calculado: proyecto.montoTotal * porcentaje / 100
+  fechaFacturacion DateTime
+  estado           String    @default("EMITIDA") // EMITIDA, COBRADA
+  fechaCobro       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  proyecto Proyecto @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
+
+  @@index([proyectoId])
+  @@index([estado])
+  @@index([fechaCobro])
+}
