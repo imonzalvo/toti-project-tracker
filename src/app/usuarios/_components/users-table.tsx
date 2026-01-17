@@ -24,7 +24,7 @@ export function UsersTable() {
   const deleteMutation = api.auth.deleteUser.useMutation({
     onSuccess: () => {
       toast.success("Usuario eliminado");
-      utils.auth.getUsers.invalidate();
+      void utils.auth.getUsers.invalidate();
     },
     onError: (error) => {
       toast.error(error.message);

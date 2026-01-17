@@ -4,7 +4,6 @@ import { TRPCError } from "@trpc/server";
 import {
   createTRPCRouter,
   publicProcedure,
-  protectedProcedure,
   adminProcedure,
 } from "~/server/api/trpc";
 

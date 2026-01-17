@@ -38,7 +38,6 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Loader2,
-  ChevronDown,
 } from "lucide-react";
 
 type EstadoFilter = "ALL" | "NOT_STARTED" | "IN_PROGRESS" | "FINISHED";

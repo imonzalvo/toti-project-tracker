@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import bcrypt from "bcryptjs";
 import { db } from "~/server/db";
@@ -6,8 +6,8 @@ import { sessionOptions, type SessionData } from "~/lib/session";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email, password } = body as { email: string; password: string };
+    const body = (await request.json()) as { email: string; password: string };
+    const { email, password } = body;
 
     if (!email || !password) {
       return NextResponse.json(

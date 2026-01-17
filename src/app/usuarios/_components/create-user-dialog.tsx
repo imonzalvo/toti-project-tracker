@@ -42,7 +42,7 @@ export function CreateUserDialog() {
   const createMutation = api.auth.createUser.useMutation({
     onSuccess: () => {
       toast.success("Usuario creado exitosamente");
-      utils.auth.getUsers.invalidate();
+      void utils.auth.getUsers.invalidate();
       setOpen(false);
       reset();
     },

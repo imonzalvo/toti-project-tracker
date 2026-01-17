@@ -54,10 +54,10 @@ export default function LoginPage() {
         credentials: "include",
       });
 
-      const result = await response.json();
+      const result = (await response.json()) as { error?: string };
 
       if (!response.ok) {
-        toast.error(result.error || "Error al iniciar sesión");
+        toast.error(result.error ?? "Error al iniciar sesión");
         setIsSubmitting(false);
         return;
       }

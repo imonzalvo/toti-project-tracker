@@ -160,7 +160,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/imonzalvo/projects/personal/toti-proyect-tracker/generated/prisma",
+      "value": "/Users/ignaciomonzalvo/projects/toti-proyect-tracker/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -174,7 +174,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/imonzalvo/projects/personal/toti-proyect-tracker/prisma/schema.prisma",
+    "sourceFilePath": "/Users/ignaciomonzalvo/projects/toti-proyect-tracker/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -188,6 +188,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "~/lib/utils";
-import { useAuth } from "~/lib/auth-context";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -43,7 +42,6 @@ const navItems: NavItem[] = [
 
 export function MobileNav() {
   const pathname = usePathname();
-  const { isAdmin } = useAuth();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">

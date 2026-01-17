@@ -15,7 +15,6 @@ import { getIronSession } from "iron-session";
 import { db } from "~/server/db";
 import {
   type SessionData,
-  type SessionUser,
   sessionOptions,
 } from "~/lib/session";
 
@@ -42,7 +41,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
   return {
     db,
     session,
-    user: session.user as SessionUser | undefined,
+    user: session.user,
     ...opts,
   };
 };

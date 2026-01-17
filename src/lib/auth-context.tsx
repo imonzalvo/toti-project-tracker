@@ -20,16 +20,18 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: user, isLoading } = api.auth.getCurrentUser.useQuery();
 
-  const logout = async () => {
-    try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      window.location.href = "/login";
-    } catch {
-      window.location.href = "/login";
-    }
+  const logout = () => {
+    void (async () => {
+      try {
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+        window.location.href = "/login";
+      } catch {
+        window.location.href = "/login";
+      }
+    })();
   };
 
   return (

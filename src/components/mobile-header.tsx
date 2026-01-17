@@ -12,7 +12,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "~/components/ui/sheet";
-import { Separator } from "~/components/ui/separator";
 import { Navigation } from "./navigation";
 import { CuentaSelector } from "./cuenta-selector";
 import { useAuth } from "~/lib/auth-context";
