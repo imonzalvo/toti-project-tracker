@@ -10,6 +10,7 @@ import {
   FileText,
   CheckCircle2,
   Clock,
+  CalendarCheck,
 } from "lucide-react";
 
 export function DashboardStats() {
@@ -59,10 +60,18 @@ export function DashboardStats() {
       color: "text-amber-600",
       bgColor: "bg-amber-100",
     },
+    {
+      title: `Aprobado ${stats.anioActual}`,
+      value: formatCurrency(stats.presupuestoAnioActual, moneda),
+      description: `Presupuesto aprobado en ${stats.anioActual}`,
+      icon: CalendarCheck,
+      color: "text-orange-600",
+      bgColor: "bg-orange-100",
+    },
   ];
 
   return (
-    <div className="grid gap-3 grid-cols-2 sm:gap-4 lg:grid-cols-5">
+    <div className="grid gap-3 grid-cols-2 sm:gap-4 lg:grid-cols-6">
       {statCards.map((stat) => (
         <Card key={stat.title} className="overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between p-3 pb-1 sm:p-6 sm:pb-2">

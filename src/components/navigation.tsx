@@ -10,6 +10,7 @@ import {
   Receipt,
   Calculator,
   Users,
+  BarChart2,
 } from "lucide-react";
 
 interface NavItem {
@@ -39,6 +40,11 @@ const navItems: NavItem[] = [
     title: "Cobros Trimestrales",
     href: "/cobros",
     icon: Calculator,
+  },
+  {
+    title: "Métricas",
+    href: "/metricas",
+    icon: BarChart2,
   },
   {
     title: "Usuarios",

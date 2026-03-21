@@ -1,10 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +20,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { api } from "~/trpc/react";
 import {
   formatCurrency,
@@ -22,9 +32,11 @@ import { useAuth } from "~/lib/auth-context";
 import {
   ArrowLeft,
   MoreHorizontal,
+  Pencil,
   PlayCircle,
   CheckCircle2,
   Trash2,
+  Loader2,
 } from "lucide-react";
 
 interface ProyectoHeaderProps {
@@ -37,9 +49,17 @@ export function ProyectoHeader({ id }: ProyectoHeaderProps) {
   const { data: proyecto } = api.proyecto.getById.useQuery({ id });
   const utils = api.useUtils();
 
+  const [editOpen, setEditOpen] = useState(false);
+  const [editData, setEditData] = useState({
+    nombre: "",
+    comisionPct: "",
+    project_approved_at: "",
+  });
+
   const updateMutation = api.proyecto.update.useMutation({
     onSuccess: () => {
       toast.success("Proyecto actualizado");
+      setEditOpen(false);
       void utils.proyecto.getById.invalidate({ id });
       void utils.proyecto.getAll.invalidate();
       void utils.proyecto.getStats.invalidate();
@@ -84,8 +104,101 @@ export function ProyectoHeader({ id }: ProyectoHeaderProps) {
     }
   };
 
+  const handleOpenEdit = () => {
+    if (!proyecto) return;
+    setEditData({
+      nombre: proyecto.nombre,
+      comisionPct: proyecto.comisionPct.toString(),
+      project_approved_at: proyecto.project_approved_at
+        .toISOString()
+        .split("T")[0]!,
+    });
+    setEditOpen(true);
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const comisionPct = parseFloat(editData.comisionPct);
+    if (isNaN(comisionPct) || comisionPct < 0 || comisionPct > 100) {
+      toast.error("La comisión debe estar entre 0 y 100");
+      return;
+    }
+    updateMutation.mutate({
+      id,
+      nombre: editData.nombre.trim(),
+      comisionPct,
+      project_approved_at: editData.project_approved_at
+        ? new Date(editData.project_approved_at)
+        : undefined,
+    });
+  };
+
   return (
     <div className="space-y-3 sm:space-y-4">
+      {/* Dialog de edición */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-md">
+          <form onSubmit={handleEditSubmit}>
+            <DialogHeader>
+              <DialogTitle>Editar Proyecto</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-nombre">Nombre del Proyecto</Label>
+                <Input
+                  id="edit-nombre"
+                  value={editData.nombre}
+                  onChange={(e) =>
+                    setEditData((prev) => ({ ...prev, nombre: e.target.value }))
+                  }
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-comision">Porcentaje de Comisión (%)</Label>
+                <Input
+                  id="edit-comision"
+                  type="number"
+                  value={editData.comisionPct}
+                  onChange={(e) =>
+                    setEditData((prev) => ({ ...prev, comisionPct: e.target.value }))
+                  }
+                  required
+                  min="0"
+                  max="100"
+                  step="0.001"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-approved-at">Fecha de Aprobación</Label>
+                <Input
+                  id="edit-approved-at"
+                  type="date"
+                  value={editData.project_approved_at}
+                  onChange={(e) =>
+                    setEditData((prev) => ({
+                      ...prev,
+                      project_approved_at: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={updateMutation.isPending}>
+                {updateMutation.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Guardar
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Link href="/proyectos" className="flex items-center gap-1 hover:text-foreground">
@@ -124,6 +237,11 @@ export function ProyectoHeader({ id }: ProyectoHeaderProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={handleOpenEdit}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Editar proyecto
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => handleChangeEstado("IN_PROGRESS")}
               disabled={proyecto.estado === "IN_PROGRESS"}

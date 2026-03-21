@@ -2107,11 +2107,13 @@ export namespace Prisma {
   }
 
   export type ProyectoAvgAggregateOutputType = {
+    identifier_num: number | null
     montoTotal: number | null
     comisionPct: number | null
   }
 
   export type ProyectoSumAggregateOutputType = {
+    identifier_num: number | null
     montoTotal: number | null
     comisionPct: number | null
   }
@@ -2119,11 +2121,13 @@ export namespace Prisma {
   export type ProyectoMinAggregateOutputType = {
     id: string | null
     identificador: string | null
+    identifier_num: number | null
     nombre: string | null
     montoTotal: number | null
     comisionPct: number | null
     estado: string | null
     moneda: string | null
+    project_approved_at: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2131,11 +2135,13 @@ export namespace Prisma {
   export type ProyectoMaxAggregateOutputType = {
     id: string | null
     identificador: string | null
+    identifier_num: number | null
     nombre: string | null
     montoTotal: number | null
     comisionPct: number | null
     estado: string | null
     moneda: string | null
+    project_approved_at: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2143,11 +2149,13 @@ export namespace Prisma {
   export type ProyectoCountAggregateOutputType = {
     id: number
     identificador: number
+    identifier_num: number
     nombre: number
     montoTotal: number
     comisionPct: number
     estado: number
     moneda: number
+    project_approved_at: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2155,11 +2163,13 @@ export namespace Prisma {
 
 
   export type ProyectoAvgAggregateInputType = {
+    identifier_num?: true
     montoTotal?: true
     comisionPct?: true
   }
 
   export type ProyectoSumAggregateInputType = {
+    identifier_num?: true
     montoTotal?: true
     comisionPct?: true
   }
@@ -2167,11 +2177,13 @@ export namespace Prisma {
   export type ProyectoMinAggregateInputType = {
     id?: true
     identificador?: true
+    identifier_num?: true
     nombre?: true
     montoTotal?: true
     comisionPct?: true
     estado?: true
     moneda?: true
+    project_approved_at?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2179,11 +2191,13 @@ export namespace Prisma {
   export type ProyectoMaxAggregateInputType = {
     id?: true
     identificador?: true
+    identifier_num?: true
     nombre?: true
     montoTotal?: true
     comisionPct?: true
     estado?: true
     moneda?: true
+    project_approved_at?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2191,11 +2205,13 @@ export namespace Prisma {
   export type ProyectoCountAggregateInputType = {
     id?: true
     identificador?: true
+    identifier_num?: true
     nombre?: true
     montoTotal?: true
     comisionPct?: true
     estado?: true
     moneda?: true
+    project_approved_at?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2290,11 +2306,13 @@ export namespace Prisma {
   export type ProyectoGroupByOutputType = {
     id: string
     identificador: string
+    identifier_num: number
     nombre: string
     montoTotal: number
     comisionPct: number
     estado: string
     moneda: string
+    project_approved_at: Date
     createdAt: Date
     updatedAt: Date
     _count: ProyectoCountAggregateOutputType | null
@@ -2321,11 +2339,13 @@ export namespace Prisma {
   export type ProyectoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     identificador?: boolean
+    identifier_num?: boolean
     nombre?: boolean
     montoTotal?: boolean
     comisionPct?: boolean
     estado?: boolean
     moneda?: boolean
+    project_approved_at?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     facturaciones?: boolean | Proyecto$facturacionesArgs<ExtArgs>
@@ -2335,11 +2355,13 @@ export namespace Prisma {
   export type ProyectoSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     identificador?: boolean
+    identifier_num?: boolean
     nombre?: boolean
     montoTotal?: boolean
     comisionPct?: boolean
     estado?: boolean
     moneda?: boolean
+    project_approved_at?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["proyecto"]>
@@ -2347,11 +2369,13 @@ export namespace Prisma {
   export type ProyectoSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     identificador?: boolean
+    identifier_num?: boolean
     nombre?: boolean
     montoTotal?: boolean
     comisionPct?: boolean
     estado?: boolean
     moneda?: boolean
+    project_approved_at?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["proyecto"]>
@@ -2359,16 +2383,18 @@ export namespace Prisma {
   export type ProyectoSelectScalar = {
     id?: boolean
     identificador?: boolean
+    identifier_num?: boolean
     nombre?: boolean
     montoTotal?: boolean
     comisionPct?: boolean
     estado?: boolean
     moneda?: boolean
+    project_approved_at?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProyectoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "identificador" | "nombre" | "montoTotal" | "comisionPct" | "estado" | "moneda" | "createdAt" | "updatedAt", ExtArgs["result"]["proyecto"]>
+  export type ProyectoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "identificador" | "identifier_num" | "nombre" | "montoTotal" | "comisionPct" | "estado" | "moneda" | "project_approved_at" | "createdAt" | "updatedAt", ExtArgs["result"]["proyecto"]>
   export type ProyectoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     facturaciones?: boolean | Proyecto$facturacionesArgs<ExtArgs>
     _count?: boolean | ProyectoCountOutputTypeDefaultArgs<ExtArgs>
@@ -2384,11 +2410,13 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       identificador: string
+      identifier_num: number
       nombre: string
       montoTotal: number
       comisionPct: number
       estado: string
       moneda: string
+      project_approved_at: Date
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["proyecto"]>
@@ -2817,11 +2845,13 @@ export namespace Prisma {
   interface ProyectoFieldRefs {
     readonly id: FieldRef<"Proyecto", 'String'>
     readonly identificador: FieldRef<"Proyecto", 'String'>
+    readonly identifier_num: FieldRef<"Proyecto", 'Int'>
     readonly nombre: FieldRef<"Proyecto", 'String'>
     readonly montoTotal: FieldRef<"Proyecto", 'Float'>
     readonly comisionPct: FieldRef<"Proyecto", 'Float'>
     readonly estado: FieldRef<"Proyecto", 'String'>
     readonly moneda: FieldRef<"Proyecto", 'String'>
+    readonly project_approved_at: FieldRef<"Proyecto", 'DateTime'>
     readonly createdAt: FieldRef<"Proyecto", 'DateTime'>
     readonly updatedAt: FieldRef<"Proyecto", 'DateTime'>
   }
@@ -4445,11 +4475,13 @@ export namespace Prisma {
   export const ProyectoScalarFieldEnum: {
     id: 'id',
     identificador: 'identificador',
+    identifier_num: 'identifier_num',
     nombre: 'nombre',
     montoTotal: 'montoTotal',
     comisionPct: 'comisionPct',
     estado: 'estado',
     moneda: 'moneda',
+    project_approved_at: 'project_approved_at',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -4531,20 +4563,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Float'
-   */
-  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-  /**
-   * Reference to a field of type 'Float[]'
-   */
-  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -4555,6 +4573,20 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
   /**
    * Deep Input Types
@@ -4629,11 +4661,13 @@ export namespace Prisma {
     NOT?: ProyectoWhereInput | ProyectoWhereInput[]
     id?: StringFilter<"Proyecto"> | string
     identificador?: StringFilter<"Proyecto"> | string
+    identifier_num?: IntFilter<"Proyecto"> | number
     nombre?: StringFilter<"Proyecto"> | string
     montoTotal?: FloatFilter<"Proyecto"> | number
     comisionPct?: FloatFilter<"Proyecto"> | number
     estado?: StringFilter<"Proyecto"> | string
     moneda?: StringFilter<"Proyecto"> | string
+    project_approved_at?: DateTimeFilter<"Proyecto"> | Date | string
     createdAt?: DateTimeFilter<"Proyecto"> | Date | string
     updatedAt?: DateTimeFilter<"Proyecto"> | Date | string
     facturaciones?: FacturacionListRelationFilter
@@ -4642,11 +4676,13 @@ export namespace Prisma {
   export type ProyectoOrderByWithRelationInput = {
     id?: SortOrder
     identificador?: SortOrder
+    identifier_num?: SortOrder
     nombre?: SortOrder
     montoTotal?: SortOrder
     comisionPct?: SortOrder
     estado?: SortOrder
     moneda?: SortOrder
+    project_approved_at?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     facturaciones?: FacturacionOrderByRelationAggregateInput
@@ -4655,6 +4691,7 @@ export namespace Prisma {
   export type ProyectoWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     identificador?: string
+    identifier_num?: number
     AND?: ProyectoWhereInput | ProyectoWhereInput[]
     OR?: ProyectoWhereInput[]
     NOT?: ProyectoWhereInput | ProyectoWhereInput[]
@@ -4663,19 +4700,22 @@ export namespace Prisma {
     comisionPct?: FloatFilter<"Proyecto"> | number
     estado?: StringFilter<"Proyecto"> | string
     moneda?: StringFilter<"Proyecto"> | string
+    project_approved_at?: DateTimeFilter<"Proyecto"> | Date | string
     createdAt?: DateTimeFilter<"Proyecto"> | Date | string
     updatedAt?: DateTimeFilter<"Proyecto"> | Date | string
     facturaciones?: FacturacionListRelationFilter
-  }, "id" | "identificador">
+  }, "id" | "identificador" | "identifier_num">
 
   export type ProyectoOrderByWithAggregationInput = {
     id?: SortOrder
     identificador?: SortOrder
+    identifier_num?: SortOrder
     nombre?: SortOrder
     montoTotal?: SortOrder
     comisionPct?: SortOrder
     estado?: SortOrder
     moneda?: SortOrder
+    project_approved_at?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProyectoCountOrderByAggregateInput
@@ -4691,11 +4731,13 @@ export namespace Prisma {
     NOT?: ProyectoScalarWhereWithAggregatesInput | ProyectoScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Proyecto"> | string
     identificador?: StringWithAggregatesFilter<"Proyecto"> | string
+    identifier_num?: IntWithAggregatesFilter<"Proyecto"> | number
     nombre?: StringWithAggregatesFilter<"Proyecto"> | string
     montoTotal?: FloatWithAggregatesFilter<"Proyecto"> | number
     comisionPct?: FloatWithAggregatesFilter<"Proyecto"> | number
     estado?: StringWithAggregatesFilter<"Proyecto"> | string
     moneda?: StringWithAggregatesFilter<"Proyecto"> | string
+    project_approved_at?: DateTimeWithAggregatesFilter<"Proyecto"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"Proyecto"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Proyecto"> | Date | string
   }
@@ -4855,11 +4897,13 @@ export namespace Prisma {
   export type ProyectoCreateInput = {
     id?: string
     identificador: string
+    identifier_num: number
     nombre: string
     montoTotal: number
     comisionPct: number
     estado?: string
     moneda?: string
+    project_approved_at: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
     facturaciones?: FacturacionCreateNestedManyWithoutProyectoInput
@@ -4868,11 +4912,13 @@ export namespace Prisma {
   export type ProyectoUncheckedCreateInput = {
     id?: string
     identificador: string
+    identifier_num: number
     nombre: string
     montoTotal: number
     comisionPct: number
     estado?: string
     moneda?: string
+    project_approved_at: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
     facturaciones?: FacturacionUncheckedCreateNestedManyWithoutProyectoInput
@@ -4881,11 +4927,13 @@ export namespace Prisma {
   export type ProyectoUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     identificador?: StringFieldUpdateOperationsInput | string
+    identifier_num?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
     montoTotal?: FloatFieldUpdateOperationsInput | number
     comisionPct?: FloatFieldUpdateOperationsInput | number
     estado?: StringFieldUpdateOperationsInput | string
     moneda?: StringFieldUpdateOperationsInput | string
+    project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     facturaciones?: FacturacionUpdateManyWithoutProyectoNestedInput
@@ -4894,11 +4942,13 @@ export namespace Prisma {
   export type ProyectoUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     identificador?: StringFieldUpdateOperationsInput | string
+    identifier_num?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
     montoTotal?: FloatFieldUpdateOperationsInput | number
     comisionPct?: FloatFieldUpdateOperationsInput | number
     estado?: StringFieldUpdateOperationsInput | string
     moneda?: StringFieldUpdateOperationsInput | string
+    project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     facturaciones?: FacturacionUncheckedUpdateManyWithoutProyectoNestedInput
@@ -4907,11 +4957,13 @@ export namespace Prisma {
   export type ProyectoCreateManyInput = {
     id?: string
     identificador: string
+    identifier_num: number
     nombre: string
     montoTotal: number
     comisionPct: number
     estado?: string
     moneda?: string
+    project_approved_at: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -4919,11 +4971,13 @@ export namespace Prisma {
   export type ProyectoUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     identificador?: StringFieldUpdateOperationsInput | string
+    identifier_num?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
     montoTotal?: FloatFieldUpdateOperationsInput | number
     comisionPct?: FloatFieldUpdateOperationsInput | number
     estado?: StringFieldUpdateOperationsInput | string
     moneda?: StringFieldUpdateOperationsInput | string
+    project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -4931,11 +4985,13 @@ export namespace Prisma {
   export type ProyectoUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     identificador?: StringFieldUpdateOperationsInput | string
+    identifier_num?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
     montoTotal?: FloatFieldUpdateOperationsInput | number
     comisionPct?: FloatFieldUpdateOperationsInput | number
     estado?: StringFieldUpdateOperationsInput | string
     moneda?: StringFieldUpdateOperationsInput | string
+    project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5118,6 +5174,17 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type FloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
     in?: number[] | ListFloatFieldRefInput<$PrismaModel>
@@ -5142,16 +5209,19 @@ export namespace Prisma {
   export type ProyectoCountOrderByAggregateInput = {
     id?: SortOrder
     identificador?: SortOrder
+    identifier_num?: SortOrder
     nombre?: SortOrder
     montoTotal?: SortOrder
     comisionPct?: SortOrder
     estado?: SortOrder
     moneda?: SortOrder
+    project_approved_at?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProyectoAvgOrderByAggregateInput = {
+    identifier_num?: SortOrder
     montoTotal?: SortOrder
     comisionPct?: SortOrder
   }
@@ -5159,11 +5229,13 @@ export namespace Prisma {
   export type ProyectoMaxOrderByAggregateInput = {
     id?: SortOrder
     identificador?: SortOrder
+    identifier_num?: SortOrder
     nombre?: SortOrder
     montoTotal?: SortOrder
     comisionPct?: SortOrder
     estado?: SortOrder
     moneda?: SortOrder
+    project_approved_at?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5171,18 +5243,37 @@ export namespace Prisma {
   export type ProyectoMinOrderByAggregateInput = {
     id?: SortOrder
     identificador?: SortOrder
+    identifier_num?: SortOrder
     nombre?: SortOrder
     montoTotal?: SortOrder
     comisionPct?: SortOrder
     estado?: SortOrder
     moneda?: SortOrder
+    project_approved_at?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProyectoSumOrderByAggregateInput = {
+    identifier_num?: SortOrder
     montoTotal?: SortOrder
     comisionPct?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -5305,6 +5396,14 @@ export namespace Prisma {
     connectOrCreate?: FacturacionCreateOrConnectWithoutProyectoInput | FacturacionCreateOrConnectWithoutProyectoInput[]
     createMany?: FacturacionCreateManyProyectoInputEnvelope
     connect?: FacturacionWhereUniqueInput | FacturacionWhereUniqueInput[]
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -5439,6 +5538,22 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
     in?: number[] | ListFloatFieldRefInput<$PrismaModel>
@@ -5560,11 +5675,13 @@ export namespace Prisma {
   export type ProyectoCreateWithoutFacturacionesInput = {
     id?: string
     identificador: string
+    identifier_num: number
     nombre: string
     montoTotal: number
     comisionPct: number
     estado?: string
     moneda?: string
+    project_approved_at: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5572,11 +5689,13 @@ export namespace Prisma {
   export type ProyectoUncheckedCreateWithoutFacturacionesInput = {
     id?: string
     identificador: string
+    identifier_num: number
     nombre: string
     montoTotal: number
     comisionPct: number
     estado?: string
     moneda?: string
+    project_approved_at: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5600,11 +5719,13 @@ export namespace Prisma {
   export type ProyectoUpdateWithoutFacturacionesInput = {
     id?: StringFieldUpdateOperationsInput | string
     identificador?: StringFieldUpdateOperationsInput | string
+    identifier_num?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
     montoTotal?: FloatFieldUpdateOperationsInput | number
     comisionPct?: FloatFieldUpdateOperationsInput | number
     estado?: StringFieldUpdateOperationsInput | string
     moneda?: StringFieldUpdateOperationsInput | string
+    project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5612,11 +5733,13 @@ export namespace Prisma {
   export type ProyectoUncheckedUpdateWithoutFacturacionesInput = {
     id?: StringFieldUpdateOperationsInput | string
     identificador?: StringFieldUpdateOperationsInput | string
+    identifier_num?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
     montoTotal?: FloatFieldUpdateOperationsInput | number
     comisionPct?: FloatFieldUpdateOperationsInput | number
     estado?: StringFieldUpdateOperationsInput | string
     moneda?: StringFieldUpdateOperationsInput | string
+    project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

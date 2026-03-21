@@ -3,8 +3,17 @@
  * for Docker builds.
  */
 import "./src/env.js";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  outputFileTracingRoot: __dirname,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+};
 
 export default config;

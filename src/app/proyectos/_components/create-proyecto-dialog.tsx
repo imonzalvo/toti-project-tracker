@@ -25,11 +25,13 @@ export function CreateProyectoDialog() {
   const { moneda, monedaLabel } = useCuenta();
   const { isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
+  const today = new Date().toISOString().split("T")[0]!;
   const [formData, setFormData] = useState({
     identificador: "",
     nombre: "",
     montoTotal: "",
     comisionPct: "",
+    project_approved_at: today,
   });
 
   const utils = api.useUtils();
@@ -43,6 +45,7 @@ export function CreateProyectoDialog() {
         nombre: "",
         montoTotal: "",
         comisionPct: "",
+        project_approved_at: today,
       });
       void utils.proyecto.getAll.invalidate();
       void utils.proyecto.getStats.invalidate();
@@ -75,6 +78,9 @@ export function CreateProyectoDialog() {
       montoTotal,
       comisionPct,
       moneda,
+      project_approved_at: formData.project_approved_at
+        ? new Date(formData.project_approved_at)
+        : undefined,
     });
   };
 
@@ -110,7 +116,8 @@ export function CreateProyectoDialog() {
               <Label htmlFor="identificador">Identificador</Label>
               <Input
                 id="identificador"
-                placeholder="Ej: PRY-001"
+                type="number"
+                placeholder="Ej: 26001"
                 value={formData.identificador}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -119,6 +126,8 @@ export function CreateProyectoDialog() {
                   }))
                 }
                 required
+                min="1"
+                step="1"
               />
             </div>
 
@@ -171,6 +180,22 @@ export function CreateProyectoDialog() {
                 min="0"
                 max="100"
                 step="0.001"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="project_approved_at">Fecha de Aprobación</Label>
+              <Input
+                id="project_approved_at"
+                type="date"
+                value={formData.project_approved_at}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    project_approved_at: e.target.value,
+                  }))
+                }
+                required
               />
             </div>
           </div>

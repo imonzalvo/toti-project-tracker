@@ -134,11 +134,13 @@ exports.Prisma.UserScalarFieldEnum = {
 exports.Prisma.ProyectoScalarFieldEnum = {
   id: 'id',
   identificador: 'identificador',
+  identifier_num: 'identifier_num',
   nombre: 'nombre',
   montoTotal: 'montoTotal',
   comisionPct: 'comisionPct',
   estado: 'estado',
   moneda: 'moneda',
+  project_approved_at: 'project_approved_at',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
