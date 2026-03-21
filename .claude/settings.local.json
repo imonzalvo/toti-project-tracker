@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx shadcn:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "shadcn"
+  ]
+}

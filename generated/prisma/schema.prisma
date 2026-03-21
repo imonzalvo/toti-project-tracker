@@ -35,21 +35,25 @@ model User {
 // UYU = Pesos Uruguayos
 // USD = Dólares Americanos
 model Proyecto {
-  id            String   @id @default(cuid())
-  identificador String   @unique
-  nombre        String
-  montoTotal    Float
-  comisionPct   Float
-  estado        String   @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, FINISHED
-  moneda        String   @default("USD") // UYU, USD
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  identificador       String   @unique
+  identifier_num      Int      @unique
+  nombre              String
+  montoTotal          Float
+  comisionPct         Float
+  estado              String   @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, FINISHED
+  moneda              String   @default("USD") // UYU, USD
+  project_approved_at DateTime
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   facturaciones Facturacion[]
 
   @@index([identificador])
+  @@index([identifier_num])
   @@index([estado])
   @@index([moneda])
+  @@index([project_approved_at])
 }
 
 // Estado de la facturación

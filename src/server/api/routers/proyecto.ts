@@ -35,7 +35,7 @@ export const proyectoRouter = createTRPCRouter({
           facturaciones: true,
         },
         orderBy: {
-          createdAt: "desc",
+          identifier_num: "desc",
         },
       });
 
@@ -99,7 +99,7 @@ export const proyectoRouter = createTRPCRouter({
           facturaciones: true,
         },
         orderBy: {
-          createdAt: "desc",
+          identifier_num: "desc",
         },
         skip,
         take: pageSize,
@@ -189,17 +189,25 @@ export const proyectoRouter = createTRPCRouter({
           .min(0, "Comisión mínima 0%")
           .max(100, "Comisión máxima 100%"),
         moneda: z.enum(["UYU", "USD"]),
+        project_approved_at: z.date().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const identifier_num = parseInt(input.identificador, 10);
+      if (isNaN(identifier_num)) {
+        throw new Error("El identificador debe ser un número entero");
+      }
+
       return ctx.db.proyecto.create({
         data: {
           identificador: input.identificador,
+          identifier_num,
           nombre: input.nombre,
           montoTotal: input.montoTotal,
           comisionPct: input.comisionPct,
           estado: EstadoProyecto.NOT_STARTED,
           moneda: input.moneda,
+          project_approved_at: input.project_approved_at ?? new Date(),
         },
       });
     }),
@@ -214,6 +222,7 @@ export const proyectoRouter = createTRPCRouter({
         estado: z
           .enum(["NOT_STARTED", "IN_PROGRESS", "FINISHED"])
           .optional(),
+        project_approved_at: z.date().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -233,6 +242,110 @@ export const proyectoRouter = createTRPCRouter({
       });
     }),
 
+  // Obtener métricas para un rango de fechas
+  getMetrics: protectedProcedure
+    .input(
+      z.object({
+        moneda: z.enum(["UYU", "USD"]),
+        fechaDesde: z.date(),
+        fechaHasta: z.date(),
+        page: z.number().min(1).default(1),
+        pageSize: z.number().min(1).max(100).default(10),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { moneda, fechaDesde, fechaHasta, page, pageSize } = input;
+      const skip = (page - 1) * pageSize;
+
+      const whereProyecto = {
+        moneda,
+        project_approved_at: { gte: fechaDesde, lte: fechaHasta },
+      };
+
+      const [
+        presupuestoAggregate,
+        totalProyectos,
+        todosLosProyectos,
+        proyectosPagina,
+      ] = await Promise.all([
+        ctx.db.proyecto.aggregate({
+          where: whereProyecto,
+          _sum: { montoTotal: true },
+        }),
+        ctx.db.proyecto.count({ where: whereProyecto }),
+        // Todos los proyectos del rango (sin paginar) para la gráfica por mes
+        ctx.db.proyecto.findMany({
+          where: whereProyecto,
+          select: { project_approved_at: true, montoTotal: true },
+        }),
+        // Proyectos paginados con sus facturaciones
+        ctx.db.proyecto.findMany({
+          where: whereProyecto,
+          include: { facturaciones: true },
+          orderBy: { identifier_num: "desc" },
+          skip,
+          take: pageSize,
+        }),
+      ]);
+
+      // Totales de facturaciones de los proyectos en el rango
+      const proyectoIds = proyectosPagina.map((p) => p.id);
+      const [facturadoAggregate, cobradoAggregate] = await Promise.all([
+        ctx.db.facturacion.aggregate({
+          where: { proyectoId: { in: proyectoIds } },
+          _sum: { monto: true },
+        }),
+        ctx.db.facturacion.aggregate({
+          where: { proyectoId: { in: proyectoIds }, estado: "COBRADA" },
+          _sum: { monto: true },
+        }),
+      ]);
+
+      // Agrupar por mes para la gráfica
+      const porMesMap = new Map<string, { mes: number; anio: number; total: number }>();
+      todosLosProyectos.forEach(({ project_approved_at, montoTotal }) => {
+        const mes = project_approved_at.getUTCMonth() + 1;
+        const anio = project_approved_at.getUTCFullYear();
+        const key = `${anio}-${mes}`;
+        const existing = porMesMap.get(key);
+        if (existing) {
+          existing.total += montoTotal;
+        } else {
+          porMesMap.set(key, { mes, anio, total: montoTotal });
+        }
+      });
+      const porMes = Array.from(porMesMap.values()).sort(
+        (a, b) => a.anio !== b.anio ? a.anio - b.anio : a.mes - b.mes
+      );
+
+      // Proyectos con montos calculados
+      const proyectosConMontos = proyectosPagina.map((proyecto) => {
+        const montoFacturado = proyecto.facturaciones.reduce((sum, f) => sum + f.monto, 0);
+        const montoCobrado = proyecto.facturaciones
+          .filter((f) => f.estado === "COBRADA")
+          .reduce((sum, f) => sum + f.monto, 0);
+        const { facturaciones: _, ...rest } = proyecto;
+        return { ...rest, montoFacturado, montoCobrado };
+      });
+
+      return {
+        totales: {
+          presupuesto: presupuestoAggregate._sum.montoTotal ?? 0,
+          facturado: facturadoAggregate._sum.monto ?? 0,
+          cobrado: cobradoAggregate._sum.monto ?? 0,
+          proyectos: totalProyectos,
+        },
+        porMes,
+        proyectos: proyectosConMontos,
+        pagination: {
+          page,
+          pageSize,
+          total: totalProyectos,
+          totalPages: Math.ceil(totalProyectos / pageSize),
+        },
+      };
+    }),
+
   // Obtener estadísticas generales para el dashboard (filtrado por moneda)
   getStats: protectedProcedure
     .input(
@@ -241,41 +354,43 @@ export const proyectoRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      const proyectos = await ctx.db.proyecto.findMany({
-        where: {
-          moneda: input.moneda,
-        },
-        include: {
-          facturaciones: true,
-        },
-      });
+      const currentYear = new Date().getFullYear();
+      const yearStart = new Date(currentYear, 0, 1);
+      const yearEnd = new Date(currentYear + 1, 0, 1);
 
-      const totalProyectos = proyectos.length;
-      const proyectosActivos = proyectos.filter(
-        (p) => p.estado === "IN_PROGRESS"
-      ).length;
+      const [
+        totalProyectos,
+        proyectosActivos,
+        facturacionPorEstado,
+        presupuestoAggregate,
+      ] = await Promise.all([
+        ctx.db.proyecto.count({ where: { moneda: input.moneda } }),
+        ctx.db.proyecto.count({ where: { moneda: input.moneda, estado: "IN_PROGRESS" } }),
+        ctx.db.facturacion.groupBy({
+          by: ["estado"],
+          where: { proyecto: { moneda: input.moneda } },
+          _sum: { monto: true },
+        }),
+        ctx.db.proyecto.aggregate({
+          where: {
+            moneda: input.moneda,
+            project_approved_at: { gte: yearStart, lt: yearEnd },
+          },
+          _sum: { montoTotal: true },
+        }),
+      ]);
 
-      let totalFacturado = 0;
-      let totalCobrado = 0;
-      let totalPendiente = 0;
-
-      proyectos.forEach((proyecto) => {
-        proyecto.facturaciones.forEach((f) => {
-          totalFacturado += f.monto;
-          if (f.estado === "COBRADA") {
-            totalCobrado += f.monto;
-          } else {
-            totalPendiente += f.monto;
-          }
-        });
-      });
+      const totalFacturado = facturacionPorEstado.reduce((sum, g) => sum + (g._sum.monto ?? 0), 0);
+      const totalCobrado = facturacionPorEstado.find((g) => g.estado === "COBRADA")?._sum.monto ?? 0;
 
       return {
         totalProyectos,
         proyectosActivos,
         totalFacturado,
         totalCobrado,
-        totalPendiente,
+        totalPendiente: totalFacturado - totalCobrado,
+        presupuestoAnioActual: presupuestoAggregate._sum.montoTotal ?? 0,
+        anioActual: currentYear,
         moneda: input.moneda,
       };
     }),
