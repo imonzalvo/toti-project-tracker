@@ -104,7 +104,7 @@ Controles de paginación ubicados debajo de la tabla:
 ### 3.3 Interacciones
 
 * Click en fila o botón "Ver" abre la **Vista de Proyecto**
-* Ordenamiento por nombre, estado o % facturado
+* Orden por defecto del listado: fecha de aprobación (más reciente primero); a igual fecha, por identificador numérico descendente
 
 ### 3.4 Estados vacíos
 

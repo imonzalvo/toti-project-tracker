@@ -34,9 +34,10 @@ export const proyectoRouter = createTRPCRouter({
         include: {
           facturaciones: true,
         },
-        orderBy: {
-          identifier_num: "desc",
-        },
+        orderBy: [
+          { project_approved_at: "desc" },
+          { identifier_num: "desc" },
+        ],
       });
 
       // Calcular porcentajes facturados y cobrados para cada proyecto
@@ -98,9 +99,10 @@ export const proyectoRouter = createTRPCRouter({
         include: {
           facturaciones: true,
         },
-        orderBy: {
-          identifier_num: "desc",
-        },
+        orderBy: [
+          { project_approved_at: "desc" },
+          { identifier_num: "desc" },
+        ],
         skip,
         take: pageSize,
       });
@@ -282,7 +284,10 @@ export const proyectoRouter = createTRPCRouter({
         ctx.db.proyecto.findMany({
           where: whereProyecto,
           include: { facturaciones: true },
-          orderBy: { identifier_num: "desc" },
+          orderBy: [
+            { project_approved_at: "desc" },
+            { identifier_num: "desc" },
+          ],
           skip,
           take: pageSize,
         }),

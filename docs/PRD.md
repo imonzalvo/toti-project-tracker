@@ -283,6 +283,7 @@ Para un periodo dado:
 
 ### Filtros y paginación de proyectos
 El listado de proyectos incluye filtros y paginación server-side:
+- **Orden por defecto:** Fecha de aprobación del proyecto descendente (más reciente primero); a igual fecha, por número de identificador descendente
 - **Por estado:** Selector con opciones "Todos", "No comenzó", "En progreso", "Finalizado"
 - **Por nombre:** Buscador de texto libre con debounce de 300ms (case insensitive)
 - **Por identificador:** Buscador de texto libre con debounce de 300ms (case insensitive)
