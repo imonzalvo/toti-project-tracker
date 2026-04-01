@@ -293,15 +293,13 @@ export const proyectoRouter = createTRPCRouter({
         }),
       ]);
 
-      // Totales de facturaciones de los proyectos en el rango
-      const proyectoIds = proyectosPagina.map((p) => p.id);
       const [facturadoAggregate, cobradoAggregate] = await Promise.all([
         ctx.db.facturacion.aggregate({
-          where: { proyectoId: { in: proyectoIds } },
+          where: { proyecto: whereProyecto },
           _sum: { monto: true },
         }),
         ctx.db.facturacion.aggregate({
-          where: { proyectoId: { in: proyectoIds }, estado: "COBRADA" },
+          where: { proyecto: whereProyecto, estado: "COBRADA" },
           _sum: { monto: true },
         }),
       ]);
