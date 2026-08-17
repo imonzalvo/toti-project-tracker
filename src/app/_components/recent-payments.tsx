@@ -66,6 +66,9 @@ export function RecentPayments() {
                     <p className="truncate font-mono text-sm font-medium">
                       {factura.proyecto.identificador}
                     </p>
+                    <p className="truncate text-xs font-medium text-foreground">
+                      {factura.proyecto.nombre}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {getTipoFacturacionLabel(factura.descripcion)}
                     </p>
@@ -97,12 +100,17 @@ export function RecentPayments() {
               <TableBody>
                 {cobradas.map((factura) => (
                   <TableRow key={factura.id}>
-                    <TableCell className="font-medium">
+                    <TableCell>
                       <Link
                         href={`/proyectos/${factura.proyectoId}`}
-                        className="hover:underline"
+                        className="group flex flex-col"
                       >
-                        {factura.proyecto.identificador}
+                        <span className="font-mono text-sm font-medium group-hover:underline">
+                          {factura.proyecto.identificador}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {factura.proyecto.nombre}
+                        </span>
                       </Link>
                     </TableCell>
                     <TableCell>
