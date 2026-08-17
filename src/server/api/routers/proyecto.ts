@@ -1,9 +1,12 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import {
   createTRPCRouter,
   protectedProcedure,
   adminProcedure,
 } from "~/server/api/trpc";
+import { rethrowAsNotFound } from "~/server/api/tenant";
+import type { Prisma } from "~/server/db";
 
 // Enums para estados
 export const EstadoProyecto = {
@@ -29,6 +32,7 @@ export const proyectoRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const proyectos = await ctx.db.proyecto.findMany({
         where: {
+          ownerId: ctx.tenantId,
           moneda: input.moneda,
         },
         include: {
@@ -75,7 +79,8 @@ export const proyectoRouter = createTRPCRouter({
       const skip = (page - 1) * pageSize;
 
       // Construir el where clause
-      const where = {
+      const where: Prisma.ProyectoWhereInput = {
+        ownerId: ctx.tenantId,
         moneda,
         ...(estado && { estado }),
         ...(nombre && {
@@ -140,7 +145,7 @@ export const proyectoRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const proyecto = await ctx.db.proyecto.findUnique({
-        where: { id: input.id },
+        where: { id: input.id, ownerId: ctx.tenantId },
         include: {
           facturaciones: {
             orderBy: {
@@ -151,7 +156,7 @@ export const proyectoRouter = createTRPCRouter({
       });
 
       if (!proyecto) {
-        throw new Error("Proyecto no encontrado");
+        throw new TRPCError({ code: "NOT_FOUND", message: "Proyecto no encontrado" });
       }
 
       const totalFacturado = proyecto.facturaciones.reduce(
@@ -200,18 +205,29 @@ export const proyectoRouter = createTRPCRouter({
         throw new Error("El identificador debe ser un número entero");
       }
 
-      return ctx.db.proyecto.create({
-        data: {
-          identificador: input.identificador,
-          identifier_num,
-          nombre: input.nombre,
-          montoTotal: input.montoTotal,
-          comisionPct: input.comisionPct,
-          estado: EstadoProyecto.NOT_STARTED,
-          moneda: input.moneda,
-          project_approved_at: input.project_approved_at ?? new Date(),
-        },
-      });
+      try {
+        return await ctx.db.proyecto.create({
+          data: {
+            ownerId: ctx.tenantId,
+            identificador: input.identificador,
+            identifier_num,
+            nombre: input.nombre,
+            montoTotal: input.montoTotal,
+            comisionPct: input.comisionPct,
+            estado: EstadoProyecto.NOT_STARTED,
+            moneda: input.moneda,
+            project_approved_at: input.project_approved_at ?? new Date(),
+          },
+        });
+      } catch (e) {
+        if (typeof e === "object" && e !== null && "code" in e && e.code === "P2002") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Ya existe un proyecto con ese identificador",
+          });
+        }
+        throw e;
+      }
     }),
 
   // Actualizar proyecto (solo admin)
@@ -229,19 +245,23 @@ export const proyectoRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
-      return ctx.db.proyecto.update({
-        where: { id },
-        data,
-      });
+      return ctx.db.proyecto
+        .update({
+          where: { id, ownerId: ctx.tenantId },
+          data,
+        })
+        .catch((e: unknown) => rethrowAsNotFound(e, "Proyecto no encontrado"));
     }),
 
   // Eliminar proyecto (solo admin)
   delete: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.proyecto.delete({
-        where: { id: input.id },
-      });
+      return ctx.db.proyecto
+        .delete({
+          where: { id: input.id, ownerId: ctx.tenantId },
+        })
+        .catch((e: unknown) => rethrowAsNotFound(e, "Proyecto no encontrado"));
     }),
 
   // Obtener métricas para un rango de fechas
@@ -259,7 +279,8 @@ export const proyectoRouter = createTRPCRouter({
       const { moneda, fechaDesde, fechaHasta, page, pageSize } = input;
       const skip = (page - 1) * pageSize;
 
-      const whereProyecto = {
+      const whereProyecto: Prisma.ProyectoWhereInput = {
+        ownerId: ctx.tenantId,
         moneda,
         project_approved_at: { gte: fechaDesde, lte: fechaHasta },
       };
@@ -295,11 +316,11 @@ export const proyectoRouter = createTRPCRouter({
 
       const [facturadoAggregate, cobradoAggregate] = await Promise.all([
         ctx.db.facturacion.aggregate({
-          where: { proyecto: whereProyecto },
+          where: { ownerId: ctx.tenantId, proyecto: whereProyecto },
           _sum: { monto: true },
         }),
         ctx.db.facturacion.aggregate({
-          where: { proyecto: whereProyecto, estado: "COBRADA" },
+          where: { ownerId: ctx.tenantId, proyecto: whereProyecto, estado: "COBRADA" },
           _sum: { monto: true },
         }),
       ]);
@@ -367,15 +388,18 @@ export const proyectoRouter = createTRPCRouter({
         facturacionPorEstado,
         presupuestoAggregate,
       ] = await Promise.all([
-        ctx.db.proyecto.count({ where: { moneda: input.moneda } }),
-        ctx.db.proyecto.count({ where: { moneda: input.moneda, estado: "IN_PROGRESS" } }),
+        ctx.db.proyecto.count({ where: { ownerId: ctx.tenantId, moneda: input.moneda } }),
+        ctx.db.proyecto.count({
+          where: { ownerId: ctx.tenantId, moneda: input.moneda, estado: "IN_PROGRESS" },
+        }),
         ctx.db.facturacion.groupBy({
           by: ["estado"],
-          where: { proyecto: { moneda: input.moneda } },
+          where: { ownerId: ctx.tenantId, proyecto: { moneda: input.moneda } },
           _sum: { monto: true },
         }),
         ctx.db.proyecto.aggregate({
           where: {
+            ownerId: ctx.tenantId,
             moneda: input.moneda,
             project_approved_at: { gte: yearStart, lt: yearEnd },
           },

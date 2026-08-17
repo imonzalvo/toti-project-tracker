@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { TRPCClientError } from "@trpc/client";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -26,15 +28,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const { data: setupStatus, isLoading: checkingSetup } =
-    api.auth.checkSetup.useQuery();
-
-  useEffect(() => {
-    if (setupStatus?.needsSetup) {
-      window.location.href = "/setup";
-    }
-  }, [setupStatus]);
+  const loginMutation = api.auth.login.useMutation();
 
   const {
     register,
@@ -47,40 +41,17 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-
-      const result = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        toast.error(result.error ?? "Error al iniciar sesión");
-        setIsSubmitting(false);
-        return;
-      }
-
+      await loginMutation.mutateAsync(data);
       toast.success("¡Bienvenido!");
+      // Navegación completa (no router.push) para descartar el cache de tRPC.
       window.location.href = "/";
-    } catch {
-      toast.error("Error al conectar con el servidor");
+    } catch (error) {
+      const message =
+        error instanceof TRPCClientError ? error.message : "Error al conectar con el servidor";
+      toast.error(message);
       setIsSubmitting(false);
     }
   };
-
-  if (checkingSetup) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Cargando...</div>
-      </div>
-    );
-  }
-
-  if (setupStatus?.needsSetup) {
-    return null;
-  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
@@ -128,6 +99,13 @@ export default function LoginPage() {
               {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
             </Button>
           </form>
+
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            ¿No tenés cuenta?{" "}
+            <Link href="/registro" className="font-medium text-primary hover:underline">
+              Registrate
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>

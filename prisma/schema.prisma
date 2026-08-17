@@ -14,17 +14,28 @@ datasource db {
 // Roles de usuario
 // ADMIN = Puede crear, modificar y eliminar recursos y usuarios
 // GUEST = Solo puede ver recursos
+//
+// Multitenancy: un User con ownerId = NULL es la raíz de un tenant.
+// Los demás usuarios cuelgan de esa raíz (ownerId apunta a ella).
+// El tenant efectivo de cualquier usuario es COALESCE(ownerId, id).
 model User {
     id        String   @id @default(cuid())
     email     String   @unique
     password  String // Hashed password
     name      String
     role      String   @default("GUEST") // ADMIN, GUEST
+    ownerId   String? // null => este user ES la raíz de un tenant
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    owner    User?  @relation("TenantMiembros", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+    miembros User[] @relation("TenantMiembros")
+
+    proyectos Proyecto[] @relation("TenantProyectos")
+
     @@index([email])
     @@index([role])
+    @@index([ownerId])
 }
 
 // Estado operativo del proyecto
@@ -36,8 +47,9 @@ model User {
 // USD = Dólares Americanos
 model Proyecto {
     id                  String   @id @default(cuid())
-    identificador       String   @unique
-    identifier_num      Int      @unique
+    ownerId             String
+    identificador       String
+    identifier_num      Int
     nombre              String
     montoTotal          Float
     comisionPct         Float
@@ -47,8 +59,14 @@ model Proyecto {
     createdAt           DateTime @default(now())
     updatedAt           DateTime @updatedAt
 
+    owner         User          @relation("TenantProyectos", fields: [ownerId], references: [id], onDelete: Restrict)
     facturaciones Facturacion[]
 
+    @@unique([ownerId, identificador])
+    @@unique([ownerId, identifier_num])
+    @@unique([id, ownerId]) // destino del FK compuesto de Facturacion
+    @@index([ownerId])
+    @@index([ownerId, moneda])
     @@index([identificador])
     @@index([identifier_num])
     @@index([estado])
@@ -61,6 +79,7 @@ model Proyecto {
 // COBRADA = Factura cobrada
 model Facturacion {
     id               String    @id @default(cuid())
+    ownerId          String // Desnormalizado del Proyecto padre (ver FK compuesto abajo)
     proyectoId       String
     descripcion      String // APROBACION, ENTREGA_PARCIAL, ENTREGA_TOTAL
     porcentaje       Float // Porcentaje del monto total del proyecto
@@ -71,8 +90,12 @@ model Facturacion {
     createdAt        DateTime  @default(now())
     updatedAt        DateTime  @updatedAt
 
-    proyecto Proyecto @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
+    // FK compuesto: garantiza que Facturacion.ownerId SIEMPRE coincide con el
+    // ownerId de su Proyecto (estado inconsistente irrepresentable en la base).
+    proyecto Proyecto @relation(fields: [proyectoId, ownerId], references: [id, ownerId], onDelete: Cascade)
 
+    @@index([ownerId])
+    @@index([ownerId, estado])
     @@index([proyectoId])
     @@index([estado])
     @@index([fechaCobro])

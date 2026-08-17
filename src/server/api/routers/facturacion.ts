@@ -1,9 +1,12 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import {
   createTRPCRouter,
   protectedProcedure,
   adminProcedure,
 } from "~/server/api/trpc";
+import { rethrowAsNotFound } from "~/server/api/tenant";
+import type { Prisma } from "~/server/db";
 
 // Enums para estados y tipos
 export const EstadoFacturacion = {
@@ -45,7 +48,8 @@ export const facturacionRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      const where: Record<string, unknown> = {
+      const where: Prisma.FacturacionWhereInput = {
+        ownerId: ctx.tenantId,
         proyecto: {
           moneda: input.moneda,
         },
@@ -96,7 +100,8 @@ export const facturacionRouter = createTRPCRouter({
       const skip = (page - 1) * pageSize;
 
       // Construir el where clause
-      const where: Record<string, unknown> = {
+      const where: Prisma.FacturacionWhereInput = {
+        ownerId: ctx.tenantId,
         proyecto: {
           moneda,
         },
@@ -179,6 +184,7 @@ export const facturacionRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return ctx.db.facturacion.findMany({
         where: {
+          ownerId: ctx.tenantId,
           estado: "EMITIDA",
           proyecto: {
             moneda: input.moneda,
@@ -204,6 +210,7 @@ export const facturacionRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return ctx.db.facturacion.findMany({
         where: {
+          ownerId: ctx.tenantId,
           estado: "COBRADA",
           proyecto: {
             moneda: input.moneda,
@@ -230,14 +237,15 @@ export const facturacionRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Obtener el proyecto para calcular el monto
+      // Obtener el proyecto para calcular el monto (scopeado al tenant: evita
+      // que un proyectoId de otro tenant filtre su montoTotal vía `monto`).
       const proyecto = await ctx.db.proyecto.findUnique({
-        where: { id: input.proyectoId },
+        where: { id: input.proyectoId, ownerId: ctx.tenantId },
         include: { facturaciones: true },
       });
 
       if (!proyecto) {
-        throw new Error("Proyecto no encontrado");
+        throw new TRPCError({ code: "NOT_FOUND", message: "Proyecto no encontrado" });
       }
 
       const tieneAprobacion = proyecto.facturaciones.some(
@@ -293,6 +301,7 @@ export const facturacionRouter = createTRPCRouter({
 
       return ctx.db.facturacion.create({
         data: {
+          ownerId: ctx.tenantId,
           proyectoId: input.proyectoId,
           descripcion: input.descripcion,
           porcentaje: input.porcentaje,
@@ -312,26 +321,30 @@ export const facturacionRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.facturacion.update({
-        where: { id: input.id },
-        data: {
-          estado: "COBRADA",
-          fechaCobro: input.fechaCobro,
-        },
-      });
+      return ctx.db.facturacion
+        .update({
+          where: { id: input.id, ownerId: ctx.tenantId },
+          data: {
+            estado: "COBRADA",
+            fechaCobro: input.fechaCobro,
+          },
+        })
+        .catch((e: unknown) => rethrowAsNotFound(e, "Facturación no encontrada"));
     }),
 
   // Marcar facturación como no cobrada (revertir cobro, solo admin)
   marcarNoCobrada: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.facturacion.update({
-        where: { id: input.id },
-        data: {
-          estado: "EMITIDA",
-          fechaCobro: null,
-        },
-      });
+      return ctx.db.facturacion
+        .update({
+          where: { id: input.id, ownerId: ctx.tenantId },
+          data: {
+            estado: "EMITIDA",
+            fechaCobro: null,
+          },
+        })
+        .catch((e: unknown) => rethrowAsNotFound(e, "Facturación no encontrada"));
     }),
 
   // Eliminar facturación (solo admin)
@@ -340,11 +353,11 @@ export const facturacionRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // Obtener la facturación para verificar si es APROBACION
       const facturacion = await ctx.db.facturacion.findUnique({
-        where: { id: input.id },
+        where: { id: input.id, ownerId: ctx.tenantId },
       });
 
       if (!facturacion) {
-        throw new Error("Facturación no encontrada");
+        throw new TRPCError({ code: "NOT_FOUND", message: "Facturación no encontrada" });
       }
 
       // Regla: No se puede eliminar la factura de APROBACION
@@ -354,9 +367,11 @@ export const facturacionRouter = createTRPCRouter({
         );
       }
 
-      return ctx.db.facturacion.delete({
-        where: { id: input.id },
-      });
+      return ctx.db.facturacion
+        .delete({
+          where: { id: input.id, ownerId: ctx.tenantId },
+        })
+        .catch((e: unknown) => rethrowAsNotFound(e, "Facturación no encontrada"));
     }),
 
   // Editar porcentaje de una facturación (solo admin)
@@ -370,7 +385,7 @@ export const facturacionRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // Obtener la facturación con su proyecto
       const facturacion = await ctx.db.facturacion.findUnique({
-        where: { id: input.id },
+        where: { id: input.id, ownerId: ctx.tenantId },
         include: {
           proyecto: {
             include: { facturaciones: true },
@@ -379,7 +394,7 @@ export const facturacionRouter = createTRPCRouter({
       });
 
       if (!facturacion) {
-        throw new Error("Facturación no encontrada");
+        throw new TRPCError({ code: "NOT_FOUND", message: "Facturación no encontrada" });
       }
 
       // Calcular el total facturado excluyendo esta facturación
@@ -405,13 +420,15 @@ export const facturacionRouter = createTRPCRouter({
       // Calcular el nuevo monto
       const monto = (facturacion.proyecto.montoTotal * input.porcentaje) / 100;
 
-      return ctx.db.facturacion.update({
-        where: { id: input.id },
-        data: {
-          porcentaje: input.porcentaje,
-          monto,
-        },
-      });
+      return ctx.db.facturacion
+        .update({
+          where: { id: input.id, ownerId: ctx.tenantId },
+          data: {
+            porcentaje: input.porcentaje,
+            monto,
+          },
+        })
+        .catch((e: unknown) => rethrowAsNotFound(e, "Facturación no encontrada"));
     }),
 
   // Obtener cobros trimestrales (caso principal, filtrado por moneda)
@@ -429,6 +446,7 @@ export const facturacionRouter = createTRPCRouter({
       // Obtener todas las facturaciones cobradas en el periodo (filtrado por moneda)
       const facturaciones = await ctx.db.facturacion.findMany({
         where: {
+          ownerId: ctx.tenantId,
           estado: "COBRADA",
           fechaCobro: {
             gte: start,
@@ -510,6 +528,7 @@ export const facturacionRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const facturaciones = await ctx.db.facturacion.findMany({
         where: {
+          ownerId: ctx.tenantId,
           estado: "COBRADA",
           fechaCobro: { not: null },
           proyecto: {

@@ -1039,6 +1039,46 @@ export namespace Prisma {
 
 
   /**
+   * Count Type UserCountOutputType
+   */
+
+  export type UserCountOutputType = {
+    miembros: number
+    proyectos: number
+  }
+
+  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    miembros?: boolean | UserCountOutputTypeCountMiembrosArgs
+    proyectos?: boolean | UserCountOutputTypeCountProyectosArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserCountOutputType
+     */
+    select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountMiembrosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountProyectosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProyectoWhereInput
+  }
+
+
+  /**
    * Count Type ProyectoCountOutputType
    */
 
@@ -1089,6 +1129,7 @@ export namespace Prisma {
     password: string | null
     name: string | null
     role: string | null
+    ownerId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1099,6 +1140,7 @@ export namespace Prisma {
     password: string | null
     name: string | null
     role: string | null
+    ownerId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1109,6 +1151,7 @@ export namespace Prisma {
     password: number
     name: number
     role: number
+    ownerId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1121,6 +1164,7 @@ export namespace Prisma {
     password?: true
     name?: true
     role?: true
+    ownerId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1131,6 +1175,7 @@ export namespace Prisma {
     password?: true
     name?: true
     role?: true
+    ownerId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1141,6 +1186,7 @@ export namespace Prisma {
     password?: true
     name?: true
     role?: true
+    ownerId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1224,6 +1270,7 @@ export namespace Prisma {
     password: string
     name: string
     role: string
+    ownerId: string | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -1251,8 +1298,13 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    ownerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    owner?: boolean | User$ownerArgs<ExtArgs>
+    miembros?: boolean | User$miembrosArgs<ExtArgs>
+    proyectos?: boolean | User$proyectosArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1261,8 +1313,10 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    ownerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    owner?: boolean | User$ownerArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1271,8 +1325,10 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    ownerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    owner?: boolean | User$ownerArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -1281,21 +1337,39 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    ownerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "name" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "name" | "role" | "ownerId" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    owner?: boolean | User$ownerArgs<ExtArgs>
+    miembros?: boolean | User$miembrosArgs<ExtArgs>
+    proyectos?: boolean | User$proyectosArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    owner?: boolean | User$ownerArgs<ExtArgs>
+  }
+  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    owner?: boolean | User$ownerArgs<ExtArgs>
+  }
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
-    objects: {}
+    objects: {
+      owner: Prisma.$UserPayload<ExtArgs> | null
+      miembros: Prisma.$UserPayload<ExtArgs>[]
+      proyectos: Prisma.$ProyectoPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       email: string
       password: string
       name: string
       role: string
+      ownerId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -1692,6 +1766,9 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    owner<T extends User$ownerArgs<ExtArgs> = {}>(args?: Subset<T, User$ownerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    miembros<T extends User$miembrosArgs<ExtArgs> = {}>(args?: Subset<T, User$miembrosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    proyectos<T extends User$proyectosArgs<ExtArgs> = {}>(args?: Subset<T, User$proyectosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProyectoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1726,6 +1803,7 @@ export namespace Prisma {
     readonly password: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'String'>
+    readonly ownerId: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -1745,6 +1823,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1763,6 +1845,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1780,6 +1866,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -1829,6 +1919,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where?: UserWhereInput
@@ -1877,6 +1971,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which Users to fetch.
      */
     where?: UserWhereInput
@@ -1920,6 +2018,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * The data needed to create a User.
      */
     data: XOR<UserCreateInput, UserUncheckedCreateInput>
@@ -1953,6 +2055,10 @@ export namespace Prisma {
      */
     data: UserCreateManyInput | UserCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -1967,6 +2073,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to update a User.
      */
@@ -2019,6 +2129,10 @@ export namespace Prisma {
      * Limit how many Users to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -2033,6 +2147,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * The filter to search for the User to update in case it exists.
      */
@@ -2060,6 +2178,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter which User to delete.
      */
     where: UserWhereUniqueInput
@@ -2080,6 +2202,73 @@ export namespace Prisma {
   }
 
   /**
+   * User.owner
+   */
+  export type User$ownerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * User.miembros
+   */
+  export type User$miembrosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
+  }
+
+  /**
+   * User.proyectos
+   */
+  export type User$proyectosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Proyecto
+     */
+    select?: ProyectoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Proyecto
+     */
+    omit?: ProyectoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProyectoInclude<ExtArgs> | null
+    where?: ProyectoWhereInput
+    orderBy?: ProyectoOrderByWithRelationInput | ProyectoOrderByWithRelationInput[]
+    cursor?: ProyectoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProyectoScalarFieldEnum | ProyectoScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2091,6 +2280,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
   }
 
 
@@ -2120,6 +2313,7 @@ export namespace Prisma {
 
   export type ProyectoMinAggregateOutputType = {
     id: string | null
+    ownerId: string | null
     identificador: string | null
     identifier_num: number | null
     nombre: string | null
@@ -2134,6 +2328,7 @@ export namespace Prisma {
 
   export type ProyectoMaxAggregateOutputType = {
     id: string | null
+    ownerId: string | null
     identificador: string | null
     identifier_num: number | null
     nombre: string | null
@@ -2148,6 +2343,7 @@ export namespace Prisma {
 
   export type ProyectoCountAggregateOutputType = {
     id: number
+    ownerId: number
     identificador: number
     identifier_num: number
     nombre: number
@@ -2176,6 +2372,7 @@ export namespace Prisma {
 
   export type ProyectoMinAggregateInputType = {
     id?: true
+    ownerId?: true
     identificador?: true
     identifier_num?: true
     nombre?: true
@@ -2190,6 +2387,7 @@ export namespace Prisma {
 
   export type ProyectoMaxAggregateInputType = {
     id?: true
+    ownerId?: true
     identificador?: true
     identifier_num?: true
     nombre?: true
@@ -2204,6 +2402,7 @@ export namespace Prisma {
 
   export type ProyectoCountAggregateInputType = {
     id?: true
+    ownerId?: true
     identificador?: true
     identifier_num?: true
     nombre?: true
@@ -2305,6 +2504,7 @@ export namespace Prisma {
 
   export type ProyectoGroupByOutputType = {
     id: string
+    ownerId: string
     identificador: string
     identifier_num: number
     nombre: string
@@ -2338,6 +2538,7 @@ export namespace Prisma {
 
   export type ProyectoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    ownerId?: boolean
     identificador?: boolean
     identifier_num?: boolean
     nombre?: boolean
@@ -2348,12 +2549,14 @@ export namespace Prisma {
     project_approved_at?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    owner?: boolean | UserDefaultArgs<ExtArgs>
     facturaciones?: boolean | Proyecto$facturacionesArgs<ExtArgs>
     _count?: boolean | ProyectoCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["proyecto"]>
 
   export type ProyectoSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    ownerId?: boolean
     identificador?: boolean
     identifier_num?: boolean
     nombre?: boolean
@@ -2364,10 +2567,12 @@ export namespace Prisma {
     project_approved_at?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    owner?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["proyecto"]>
 
   export type ProyectoSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    ownerId?: boolean
     identificador?: boolean
     identifier_num?: boolean
     nombre?: boolean
@@ -2378,10 +2583,12 @@ export namespace Prisma {
     project_approved_at?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    owner?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["proyecto"]>
 
   export type ProyectoSelectScalar = {
     id?: boolean
+    ownerId?: boolean
     identificador?: boolean
     identifier_num?: boolean
     nombre?: boolean
@@ -2394,21 +2601,28 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ProyectoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "identificador" | "identifier_num" | "nombre" | "montoTotal" | "comisionPct" | "estado" | "moneda" | "project_approved_at" | "createdAt" | "updatedAt", ExtArgs["result"]["proyecto"]>
+  export type ProyectoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "identificador" | "identifier_num" | "nombre" | "montoTotal" | "comisionPct" | "estado" | "moneda" | "project_approved_at" | "createdAt" | "updatedAt", ExtArgs["result"]["proyecto"]>
   export type ProyectoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    owner?: boolean | UserDefaultArgs<ExtArgs>
     facturaciones?: boolean | Proyecto$facturacionesArgs<ExtArgs>
     _count?: boolean | ProyectoCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type ProyectoIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type ProyectoIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type ProyectoIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    owner?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ProyectoIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    owner?: boolean | UserDefaultArgs<ExtArgs>
+  }
 
   export type $ProyectoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Proyecto"
     objects: {
+      owner: Prisma.$UserPayload<ExtArgs>
       facturaciones: Prisma.$FacturacionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      ownerId: string
       identificador: string
       identifier_num: number
       nombre: string
@@ -2813,6 +3027,7 @@ export namespace Prisma {
    */
   export interface Prisma__ProyectoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    owner<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     facturaciones<T extends Proyecto$facturacionesArgs<ExtArgs> = {}>(args?: Subset<T, Proyecto$facturacionesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FacturacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2844,6 +3059,7 @@ export namespace Prisma {
    */
   interface ProyectoFieldRefs {
     readonly id: FieldRef<"Proyecto", 'String'>
+    readonly ownerId: FieldRef<"Proyecto", 'String'>
     readonly identificador: FieldRef<"Proyecto", 'String'>
     readonly identifier_num: FieldRef<"Proyecto", 'Int'>
     readonly nombre: FieldRef<"Proyecto", 'String'>
@@ -3103,6 +3319,10 @@ export namespace Prisma {
      */
     data: ProyectoCreateManyInput | ProyectoCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProyectoIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3173,6 +3393,10 @@ export namespace Prisma {
      * Limit how many Proyectos to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProyectoIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3308,6 +3532,7 @@ export namespace Prisma {
 
   export type FacturacionMinAggregateOutputType = {
     id: string | null
+    ownerId: string | null
     proyectoId: string | null
     descripcion: string | null
     porcentaje: number | null
@@ -3321,6 +3546,7 @@ export namespace Prisma {
 
   export type FacturacionMaxAggregateOutputType = {
     id: string | null
+    ownerId: string | null
     proyectoId: string | null
     descripcion: string | null
     porcentaje: number | null
@@ -3334,6 +3560,7 @@ export namespace Prisma {
 
   export type FacturacionCountAggregateOutputType = {
     id: number
+    ownerId: number
     proyectoId: number
     descripcion: number
     porcentaje: number
@@ -3359,6 +3586,7 @@ export namespace Prisma {
 
   export type FacturacionMinAggregateInputType = {
     id?: true
+    ownerId?: true
     proyectoId?: true
     descripcion?: true
     porcentaje?: true
@@ -3372,6 +3600,7 @@ export namespace Prisma {
 
   export type FacturacionMaxAggregateInputType = {
     id?: true
+    ownerId?: true
     proyectoId?: true
     descripcion?: true
     porcentaje?: true
@@ -3385,6 +3614,7 @@ export namespace Prisma {
 
   export type FacturacionCountAggregateInputType = {
     id?: true
+    ownerId?: true
     proyectoId?: true
     descripcion?: true
     porcentaje?: true
@@ -3485,6 +3715,7 @@ export namespace Prisma {
 
   export type FacturacionGroupByOutputType = {
     id: string
+    ownerId: string
     proyectoId: string
     descripcion: string
     porcentaje: number
@@ -3517,6 +3748,7 @@ export namespace Prisma {
 
   export type FacturacionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    ownerId?: boolean
     proyectoId?: boolean
     descripcion?: boolean
     porcentaje?: boolean
@@ -3531,6 +3763,7 @@ export namespace Prisma {
 
   export type FacturacionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    ownerId?: boolean
     proyectoId?: boolean
     descripcion?: boolean
     porcentaje?: boolean
@@ -3545,6 +3778,7 @@ export namespace Prisma {
 
   export type FacturacionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    ownerId?: boolean
     proyectoId?: boolean
     descripcion?: boolean
     porcentaje?: boolean
@@ -3559,6 +3793,7 @@ export namespace Prisma {
 
   export type FacturacionSelectScalar = {
     id?: boolean
+    ownerId?: boolean
     proyectoId?: boolean
     descripcion?: boolean
     porcentaje?: boolean
@@ -3570,7 +3805,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FacturacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "proyectoId" | "descripcion" | "porcentaje" | "monto" | "fechaFacturacion" | "estado" | "fechaCobro" | "createdAt" | "updatedAt", ExtArgs["result"]["facturacion"]>
+  export type FacturacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "proyectoId" | "descripcion" | "porcentaje" | "monto" | "fechaFacturacion" | "estado" | "fechaCobro" | "createdAt" | "updatedAt", ExtArgs["result"]["facturacion"]>
   export type FacturacionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     proyecto?: boolean | ProyectoDefaultArgs<ExtArgs>
   }
@@ -3588,6 +3823,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      ownerId: string
       proyectoId: string
       descripcion: string
       porcentaje: number
@@ -4022,6 +4258,7 @@ export namespace Prisma {
    */
   interface FacturacionFieldRefs {
     readonly id: FieldRef<"Facturacion", 'String'>
+    readonly ownerId: FieldRef<"Facturacion", 'String'>
     readonly proyectoId: FieldRef<"Facturacion", 'String'>
     readonly descripcion: FieldRef<"Facturacion", 'String'>
     readonly porcentaje: FieldRef<"Facturacion", 'Float'>
@@ -4465,6 +4702,7 @@ export namespace Prisma {
     password: 'password',
     name: 'name',
     role: 'role',
+    ownerId: 'ownerId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -4474,6 +4712,7 @@ export namespace Prisma {
 
   export const ProyectoScalarFieldEnum: {
     id: 'id',
+    ownerId: 'ownerId',
     identificador: 'identificador',
     identifier_num: 'identifier_num',
     nombre: 'nombre',
@@ -4491,6 +4730,7 @@ export namespace Prisma {
 
   export const FacturacionScalarFieldEnum: {
     id: 'id',
+    ownerId: 'ownerId',
     proyectoId: 'proyectoId',
     descripcion: 'descripcion',
     porcentaje: 'porcentaje',
@@ -4602,8 +4842,12 @@ export namespace Prisma {
     password?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     role?: StringFilter<"User"> | string
+    ownerId?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    owner?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    miembros?: UserListRelationFilter
+    proyectos?: ProyectoListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -4612,8 +4856,12 @@ export namespace Prisma {
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    ownerId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    owner?: UserOrderByWithRelationInput
+    miembros?: UserOrderByRelationAggregateInput
+    proyectos?: ProyectoOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -4625,8 +4873,12 @@ export namespace Prisma {
     password?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     role?: StringFilter<"User"> | string
+    ownerId?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    owner?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    miembros?: UserListRelationFilter
+    proyectos?: ProyectoListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -4635,6 +4887,7 @@ export namespace Prisma {
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    ownerId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -4651,6 +4904,7 @@ export namespace Prisma {
     password?: StringWithAggregatesFilter<"User"> | string
     name?: StringWithAggregatesFilter<"User"> | string
     role?: StringWithAggregatesFilter<"User"> | string
+    ownerId?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -4660,6 +4914,7 @@ export namespace Prisma {
     OR?: ProyectoWhereInput[]
     NOT?: ProyectoWhereInput | ProyectoWhereInput[]
     id?: StringFilter<"Proyecto"> | string
+    ownerId?: StringFilter<"Proyecto"> | string
     identificador?: StringFilter<"Proyecto"> | string
     identifier_num?: IntFilter<"Proyecto"> | number
     nombre?: StringFilter<"Proyecto"> | string
@@ -4670,11 +4925,13 @@ export namespace Prisma {
     project_approved_at?: DateTimeFilter<"Proyecto"> | Date | string
     createdAt?: DateTimeFilter<"Proyecto"> | Date | string
     updatedAt?: DateTimeFilter<"Proyecto"> | Date | string
+    owner?: XOR<UserScalarRelationFilter, UserWhereInput>
     facturaciones?: FacturacionListRelationFilter
   }
 
   export type ProyectoOrderByWithRelationInput = {
     id?: SortOrder
+    ownerId?: SortOrder
     identificador?: SortOrder
     identifier_num?: SortOrder
     nombre?: SortOrder
@@ -4685,16 +4942,21 @@ export namespace Prisma {
     project_approved_at?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    owner?: UserOrderByWithRelationInput
     facturaciones?: FacturacionOrderByRelationAggregateInput
   }
 
   export type ProyectoWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    identificador?: string
-    identifier_num?: number
+    ownerId_identificador?: ProyectoOwnerIdIdentificadorCompoundUniqueInput
+    ownerId_identifier_num?: ProyectoOwnerIdIdentifier_numCompoundUniqueInput
+    id_ownerId?: ProyectoIdOwnerIdCompoundUniqueInput
     AND?: ProyectoWhereInput | ProyectoWhereInput[]
     OR?: ProyectoWhereInput[]
     NOT?: ProyectoWhereInput | ProyectoWhereInput[]
+    ownerId?: StringFilter<"Proyecto"> | string
+    identificador?: StringFilter<"Proyecto"> | string
+    identifier_num?: IntFilter<"Proyecto"> | number
     nombre?: StringFilter<"Proyecto"> | string
     montoTotal?: FloatFilter<"Proyecto"> | number
     comisionPct?: FloatFilter<"Proyecto"> | number
@@ -4703,11 +4965,13 @@ export namespace Prisma {
     project_approved_at?: DateTimeFilter<"Proyecto"> | Date | string
     createdAt?: DateTimeFilter<"Proyecto"> | Date | string
     updatedAt?: DateTimeFilter<"Proyecto"> | Date | string
+    owner?: XOR<UserScalarRelationFilter, UserWhereInput>
     facturaciones?: FacturacionListRelationFilter
-  }, "id" | "identificador" | "identifier_num">
+  }, "id" | "ownerId_identificador" | "ownerId_identifier_num" | "id_ownerId">
 
   export type ProyectoOrderByWithAggregationInput = {
     id?: SortOrder
+    ownerId?: SortOrder
     identificador?: SortOrder
     identifier_num?: SortOrder
     nombre?: SortOrder
@@ -4730,6 +4994,7 @@ export namespace Prisma {
     OR?: ProyectoScalarWhereWithAggregatesInput[]
     NOT?: ProyectoScalarWhereWithAggregatesInput | ProyectoScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Proyecto"> | string
+    ownerId?: StringWithAggregatesFilter<"Proyecto"> | string
     identificador?: StringWithAggregatesFilter<"Proyecto"> | string
     identifier_num?: IntWithAggregatesFilter<"Proyecto"> | number
     nombre?: StringWithAggregatesFilter<"Proyecto"> | string
@@ -4747,6 +5012,7 @@ export namespace Prisma {
     OR?: FacturacionWhereInput[]
     NOT?: FacturacionWhereInput | FacturacionWhereInput[]
     id?: StringFilter<"Facturacion"> | string
+    ownerId?: StringFilter<"Facturacion"> | string
     proyectoId?: StringFilter<"Facturacion"> | string
     descripcion?: StringFilter<"Facturacion"> | string
     porcentaje?: FloatFilter<"Facturacion"> | number
@@ -4761,6 +5027,7 @@ export namespace Prisma {
 
   export type FacturacionOrderByWithRelationInput = {
     id?: SortOrder
+    ownerId?: SortOrder
     proyectoId?: SortOrder
     descripcion?: SortOrder
     porcentaje?: SortOrder
@@ -4778,6 +5045,7 @@ export namespace Prisma {
     AND?: FacturacionWhereInput | FacturacionWhereInput[]
     OR?: FacturacionWhereInput[]
     NOT?: FacturacionWhereInput | FacturacionWhereInput[]
+    ownerId?: StringFilter<"Facturacion"> | string
     proyectoId?: StringFilter<"Facturacion"> | string
     descripcion?: StringFilter<"Facturacion"> | string
     porcentaje?: FloatFilter<"Facturacion"> | number
@@ -4792,6 +5060,7 @@ export namespace Prisma {
 
   export type FacturacionOrderByWithAggregationInput = {
     id?: SortOrder
+    ownerId?: SortOrder
     proyectoId?: SortOrder
     descripcion?: SortOrder
     porcentaje?: SortOrder
@@ -4813,6 +5082,7 @@ export namespace Prisma {
     OR?: FacturacionScalarWhereWithAggregatesInput[]
     NOT?: FacturacionScalarWhereWithAggregatesInput | FacturacionScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Facturacion"> | string
+    ownerId?: StringWithAggregatesFilter<"Facturacion"> | string
     proyectoId?: StringWithAggregatesFilter<"Facturacion"> | string
     descripcion?: StringWithAggregatesFilter<"Facturacion"> | string
     porcentaje?: FloatWithAggregatesFilter<"Facturacion"> | number
@@ -4832,6 +5102,9 @@ export namespace Prisma {
     role?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    owner?: UserCreateNestedOneWithoutMiembrosInput
+    miembros?: UserCreateNestedManyWithoutOwnerInput
+    proyectos?: ProyectoCreateNestedManyWithoutOwnerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -4840,8 +5113,11 @@ export namespace Prisma {
     password: string
     name: string
     role?: string
+    ownerId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    miembros?: UserUncheckedCreateNestedManyWithoutOwnerInput
+    proyectos?: ProyectoUncheckedCreateNestedManyWithoutOwnerInput
   }
 
   export type UserUpdateInput = {
@@ -4852,6 +5128,9 @@ export namespace Prisma {
     role?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneWithoutMiembrosNestedInput
+    miembros?: UserUpdateManyWithoutOwnerNestedInput
+    proyectos?: ProyectoUpdateManyWithoutOwnerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -4860,8 +5139,11 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
+    ownerId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    miembros?: UserUncheckedUpdateManyWithoutOwnerNestedInput
+    proyectos?: ProyectoUncheckedUpdateManyWithoutOwnerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -4870,6 +5152,7 @@ export namespace Prisma {
     password: string
     name: string
     role?: string
+    ownerId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -4890,6 +5173,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
+    ownerId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -4906,11 +5190,13 @@ export namespace Prisma {
     project_approved_at: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutProyectosInput
     facturaciones?: FacturacionCreateNestedManyWithoutProyectoInput
   }
 
   export type ProyectoUncheckedCreateInput = {
     id?: string
+    ownerId: string
     identificador: string
     identifier_num: number
     nombre: string
@@ -4936,11 +5222,13 @@ export namespace Prisma {
     project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutProyectosNestedInput
     facturaciones?: FacturacionUpdateManyWithoutProyectoNestedInput
   }
 
   export type ProyectoUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
     identificador?: StringFieldUpdateOperationsInput | string
     identifier_num?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
@@ -4956,6 +5244,7 @@ export namespace Prisma {
 
   export type ProyectoCreateManyInput = {
     id?: string
+    ownerId: string
     identificador: string
     identifier_num: number
     nombre: string
@@ -4984,6 +5273,7 @@ export namespace Prisma {
 
   export type ProyectoUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
     identificador?: StringFieldUpdateOperationsInput | string
     identifier_num?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
@@ -5011,6 +5301,7 @@ export namespace Prisma {
 
   export type FacturacionUncheckedCreateInput = {
     id?: string
+    ownerId: string
     proyectoId: string
     descripcion: string
     porcentaje: number
@@ -5037,6 +5328,7 @@ export namespace Prisma {
 
   export type FacturacionUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
     proyectoId?: StringFieldUpdateOperationsInput | string
     descripcion?: StringFieldUpdateOperationsInput | string
     porcentaje?: FloatFieldUpdateOperationsInput | number
@@ -5050,6 +5342,7 @@ export namespace Prisma {
 
   export type FacturacionCreateManyInput = {
     id?: string
+    ownerId: string
     proyectoId: string
     descripcion: string
     porcentaje: number
@@ -5075,6 +5368,7 @@ export namespace Prisma {
 
   export type FacturacionUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
     proyectoId?: StringFieldUpdateOperationsInput | string
     descripcion?: StringFieldUpdateOperationsInput | string
     porcentaje?: FloatFieldUpdateOperationsInput | number
@@ -5101,6 +5395,21 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -5112,12 +5421,43 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type UserListRelationFilter = {
+    every?: UserWhereInput
+    some?: UserWhereInput
+    none?: UserWhereInput
+  }
+
+  export type ProyectoListRelationFilter = {
+    every?: ProyectoWhereInput
+    some?: ProyectoWhereInput
+    none?: ProyectoWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type UserOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ProyectoOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    ownerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5128,6 +5468,7 @@ export namespace Prisma {
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    ownerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5138,6 +5479,7 @@ export namespace Prisma {
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    ownerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5158,6 +5500,24 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -5196,6 +5556,11 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
   export type FacturacionListRelationFilter = {
     every?: FacturacionWhereInput
     some?: FacturacionWhereInput
@@ -5206,8 +5571,24 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type ProyectoOwnerIdIdentificadorCompoundUniqueInput = {
+    ownerId: string
+    identificador: string
+  }
+
+  export type ProyectoOwnerIdIdentifier_numCompoundUniqueInput = {
+    ownerId: string
+    identifier_num: number
+  }
+
+  export type ProyectoIdOwnerIdCompoundUniqueInput = {
+    id: string
+    ownerId: string
+  }
+
   export type ProyectoCountOrderByAggregateInput = {
     id?: SortOrder
+    ownerId?: SortOrder
     identificador?: SortOrder
     identifier_num?: SortOrder
     nombre?: SortOrder
@@ -5228,6 +5609,7 @@ export namespace Prisma {
 
   export type ProyectoMaxOrderByAggregateInput = {
     id?: SortOrder
+    ownerId?: SortOrder
     identificador?: SortOrder
     identifier_num?: SortOrder
     nombre?: SortOrder
@@ -5242,6 +5624,7 @@ export namespace Prisma {
 
   export type ProyectoMinOrderByAggregateInput = {
     id?: SortOrder
+    ownerId?: SortOrder
     identificador?: SortOrder
     identifier_num?: SortOrder
     nombre?: SortOrder
@@ -5308,13 +5691,9 @@ export namespace Prisma {
     isNot?: ProyectoWhereInput
   }
 
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
-  }
-
   export type FacturacionCountOrderByAggregateInput = {
     id?: SortOrder
+    ownerId?: SortOrder
     proyectoId?: SortOrder
     descripcion?: SortOrder
     porcentaje?: SortOrder
@@ -5333,6 +5712,7 @@ export namespace Prisma {
 
   export type FacturacionMaxOrderByAggregateInput = {
     id?: SortOrder
+    ownerId?: SortOrder
     proyectoId?: SortOrder
     descripcion?: SortOrder
     porcentaje?: SortOrder
@@ -5346,6 +5726,7 @@ export namespace Prisma {
 
   export type FacturacionMinOrderByAggregateInput = {
     id?: SortOrder
+    ownerId?: SortOrder
     proyectoId?: SortOrder
     descripcion?: SortOrder
     porcentaje?: SortOrder
@@ -5376,12 +5757,122 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type UserCreateNestedOneWithoutMiembrosInput = {
+    create?: XOR<UserCreateWithoutMiembrosInput, UserUncheckedCreateWithoutMiembrosInput>
+    connectOrCreate?: UserCreateOrConnectWithoutMiembrosInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedManyWithoutOwnerInput = {
+    create?: XOR<UserCreateWithoutOwnerInput, UserUncheckedCreateWithoutOwnerInput> | UserCreateWithoutOwnerInput[] | UserUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutOwnerInput | UserCreateOrConnectWithoutOwnerInput[]
+    createMany?: UserCreateManyOwnerInputEnvelope
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type ProyectoCreateNestedManyWithoutOwnerInput = {
+    create?: XOR<ProyectoCreateWithoutOwnerInput, ProyectoUncheckedCreateWithoutOwnerInput> | ProyectoCreateWithoutOwnerInput[] | ProyectoUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: ProyectoCreateOrConnectWithoutOwnerInput | ProyectoCreateOrConnectWithoutOwnerInput[]
+    createMany?: ProyectoCreateManyOwnerInputEnvelope
+    connect?: ProyectoWhereUniqueInput | ProyectoWhereUniqueInput[]
+  }
+
+  export type UserUncheckedCreateNestedManyWithoutOwnerInput = {
+    create?: XOR<UserCreateWithoutOwnerInput, UserUncheckedCreateWithoutOwnerInput> | UserCreateWithoutOwnerInput[] | UserUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutOwnerInput | UserCreateOrConnectWithoutOwnerInput[]
+    createMany?: UserCreateManyOwnerInputEnvelope
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type ProyectoUncheckedCreateNestedManyWithoutOwnerInput = {
+    create?: XOR<ProyectoCreateWithoutOwnerInput, ProyectoUncheckedCreateWithoutOwnerInput> | ProyectoCreateWithoutOwnerInput[] | ProyectoUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: ProyectoCreateOrConnectWithoutOwnerInput | ProyectoCreateOrConnectWithoutOwnerInput[]
+    createMany?: ProyectoCreateManyOwnerInputEnvelope
+    connect?: ProyectoWhereUniqueInput | ProyectoWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type UserUpdateOneWithoutMiembrosNestedInput = {
+    create?: XOR<UserCreateWithoutMiembrosInput, UserUncheckedCreateWithoutMiembrosInput>
+    connectOrCreate?: UserCreateOrConnectWithoutMiembrosInput
+    upsert?: UserUpsertWithoutMiembrosInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMiembrosInput, UserUpdateWithoutMiembrosInput>, UserUncheckedUpdateWithoutMiembrosInput>
+  }
+
+  export type UserUpdateManyWithoutOwnerNestedInput = {
+    create?: XOR<UserCreateWithoutOwnerInput, UserUncheckedCreateWithoutOwnerInput> | UserCreateWithoutOwnerInput[] | UserUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutOwnerInput | UserCreateOrConnectWithoutOwnerInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutOwnerInput | UserUpsertWithWhereUniqueWithoutOwnerInput[]
+    createMany?: UserCreateManyOwnerInputEnvelope
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutOwnerInput | UserUpdateWithWhereUniqueWithoutOwnerInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutOwnerInput | UserUpdateManyWithWhereWithoutOwnerInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
+  export type ProyectoUpdateManyWithoutOwnerNestedInput = {
+    create?: XOR<ProyectoCreateWithoutOwnerInput, ProyectoUncheckedCreateWithoutOwnerInput> | ProyectoCreateWithoutOwnerInput[] | ProyectoUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: ProyectoCreateOrConnectWithoutOwnerInput | ProyectoCreateOrConnectWithoutOwnerInput[]
+    upsert?: ProyectoUpsertWithWhereUniqueWithoutOwnerInput | ProyectoUpsertWithWhereUniqueWithoutOwnerInput[]
+    createMany?: ProyectoCreateManyOwnerInputEnvelope
+    set?: ProyectoWhereUniqueInput | ProyectoWhereUniqueInput[]
+    disconnect?: ProyectoWhereUniqueInput | ProyectoWhereUniqueInput[]
+    delete?: ProyectoWhereUniqueInput | ProyectoWhereUniqueInput[]
+    connect?: ProyectoWhereUniqueInput | ProyectoWhereUniqueInput[]
+    update?: ProyectoUpdateWithWhereUniqueWithoutOwnerInput | ProyectoUpdateWithWhereUniqueWithoutOwnerInput[]
+    updateMany?: ProyectoUpdateManyWithWhereWithoutOwnerInput | ProyectoUpdateManyWithWhereWithoutOwnerInput[]
+    deleteMany?: ProyectoScalarWhereInput | ProyectoScalarWhereInput[]
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type UserUncheckedUpdateManyWithoutOwnerNestedInput = {
+    create?: XOR<UserCreateWithoutOwnerInput, UserUncheckedCreateWithoutOwnerInput> | UserCreateWithoutOwnerInput[] | UserUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutOwnerInput | UserCreateOrConnectWithoutOwnerInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutOwnerInput | UserUpsertWithWhereUniqueWithoutOwnerInput[]
+    createMany?: UserCreateManyOwnerInputEnvelope
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutOwnerInput | UserUpdateWithWhereUniqueWithoutOwnerInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutOwnerInput | UserUpdateManyWithWhereWithoutOwnerInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
+  export type ProyectoUncheckedUpdateManyWithoutOwnerNestedInput = {
+    create?: XOR<ProyectoCreateWithoutOwnerInput, ProyectoUncheckedCreateWithoutOwnerInput> | ProyectoCreateWithoutOwnerInput[] | ProyectoUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: ProyectoCreateOrConnectWithoutOwnerInput | ProyectoCreateOrConnectWithoutOwnerInput[]
+    upsert?: ProyectoUpsertWithWhereUniqueWithoutOwnerInput | ProyectoUpsertWithWhereUniqueWithoutOwnerInput[]
+    createMany?: ProyectoCreateManyOwnerInputEnvelope
+    set?: ProyectoWhereUniqueInput | ProyectoWhereUniqueInput[]
+    disconnect?: ProyectoWhereUniqueInput | ProyectoWhereUniqueInput[]
+    delete?: ProyectoWhereUniqueInput | ProyectoWhereUniqueInput[]
+    connect?: ProyectoWhereUniqueInput | ProyectoWhereUniqueInput[]
+    update?: ProyectoUpdateWithWhereUniqueWithoutOwnerInput | ProyectoUpdateWithWhereUniqueWithoutOwnerInput[]
+    updateMany?: ProyectoUpdateManyWithWhereWithoutOwnerInput | ProyectoUpdateManyWithWhereWithoutOwnerInput[]
+    deleteMany?: ProyectoScalarWhereInput | ProyectoScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutProyectosInput = {
+    create?: XOR<UserCreateWithoutProyectosInput, UserUncheckedCreateWithoutProyectosInput>
+    connectOrCreate?: UserCreateOrConnectWithoutProyectosInput
+    connect?: UserWhereUniqueInput
   }
 
   export type FacturacionCreateNestedManyWithoutProyectoInput = {
@@ -5412,6 +5903,14 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type UserUpdateOneRequiredWithoutProyectosNestedInput = {
+    create?: XOR<UserCreateWithoutProyectosInput, UserUncheckedCreateWithoutProyectosInput>
+    connectOrCreate?: UserCreateOrConnectWithoutProyectosInput
+    upsert?: UserUpsertWithoutProyectosInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutProyectosInput, UserUpdateWithoutProyectosInput>, UserUncheckedUpdateWithoutProyectosInput>
   }
 
   export type FacturacionUpdateManyWithoutProyectoNestedInput = {
@@ -5474,6 +5973,20 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -5511,6 +6024,34 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -5595,15 +6136,235 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  export type UserCreateWithoutMiembrosInput = {
+    id?: string
+    email: string
+    password: string
+    name: string
+    role?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner?: UserCreateNestedOneWithoutMiembrosInput
+    proyectos?: ProyectoCreateNestedManyWithoutOwnerInput
+  }
+
+  export type UserUncheckedCreateWithoutMiembrosInput = {
+    id?: string
+    email: string
+    password: string
+    name: string
+    role?: string
+    ownerId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    proyectos?: ProyectoUncheckedCreateNestedManyWithoutOwnerInput
+  }
+
+  export type UserCreateOrConnectWithoutMiembrosInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutMiembrosInput, UserUncheckedCreateWithoutMiembrosInput>
+  }
+
+  export type UserCreateWithoutOwnerInput = {
+    id?: string
+    email: string
+    password: string
+    name: string
+    role?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    miembros?: UserCreateNestedManyWithoutOwnerInput
+    proyectos?: ProyectoCreateNestedManyWithoutOwnerInput
+  }
+
+  export type UserUncheckedCreateWithoutOwnerInput = {
+    id?: string
+    email: string
+    password: string
+    name: string
+    role?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    miembros?: UserUncheckedCreateNestedManyWithoutOwnerInput
+    proyectos?: ProyectoUncheckedCreateNestedManyWithoutOwnerInput
+  }
+
+  export type UserCreateOrConnectWithoutOwnerInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutOwnerInput, UserUncheckedCreateWithoutOwnerInput>
+  }
+
+  export type UserCreateManyOwnerInputEnvelope = {
+    data: UserCreateManyOwnerInput | UserCreateManyOwnerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ProyectoCreateWithoutOwnerInput = {
+    id?: string
+    identificador: string
+    identifier_num: number
+    nombre: string
+    montoTotal: number
+    comisionPct: number
+    estado?: string
+    moneda?: string
+    project_approved_at: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    facturaciones?: FacturacionCreateNestedManyWithoutProyectoInput
+  }
+
+  export type ProyectoUncheckedCreateWithoutOwnerInput = {
+    id?: string
+    identificador: string
+    identifier_num: number
+    nombre: string
+    montoTotal: number
+    comisionPct: number
+    estado?: string
+    moneda?: string
+    project_approved_at: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    facturaciones?: FacturacionUncheckedCreateNestedManyWithoutProyectoInput
+  }
+
+  export type ProyectoCreateOrConnectWithoutOwnerInput = {
+    where: ProyectoWhereUniqueInput
+    create: XOR<ProyectoCreateWithoutOwnerInput, ProyectoUncheckedCreateWithoutOwnerInput>
+  }
+
+  export type ProyectoCreateManyOwnerInputEnvelope = {
+    data: ProyectoCreateManyOwnerInput | ProyectoCreateManyOwnerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutMiembrosInput = {
+    update: XOR<UserUpdateWithoutMiembrosInput, UserUncheckedUpdateWithoutMiembrosInput>
+    create: XOR<UserCreateWithoutMiembrosInput, UserUncheckedCreateWithoutMiembrosInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutMiembrosInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutMiembrosInput, UserUncheckedUpdateWithoutMiembrosInput>
+  }
+
+  export type UserUpdateWithoutMiembrosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneWithoutMiembrosNestedInput
+    proyectos?: ProyectoUpdateManyWithoutOwnerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutMiembrosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    ownerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    proyectos?: ProyectoUncheckedUpdateManyWithoutOwnerNestedInput
+  }
+
+  export type UserUpsertWithWhereUniqueWithoutOwnerInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutOwnerInput, UserUncheckedUpdateWithoutOwnerInput>
+    create: XOR<UserCreateWithoutOwnerInput, UserUncheckedCreateWithoutOwnerInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutOwnerInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutOwnerInput, UserUncheckedUpdateWithoutOwnerInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutOwnerInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutOwnerInput>
+  }
+
+  export type UserScalarWhereInput = {
+    AND?: UserScalarWhereInput | UserScalarWhereInput[]
+    OR?: UserScalarWhereInput[]
+    NOT?: UserScalarWhereInput | UserScalarWhereInput[]
+    id?: StringFilter<"User"> | string
+    email?: StringFilter<"User"> | string
+    password?: StringFilter<"User"> | string
+    name?: StringFilter<"User"> | string
+    role?: StringFilter<"User"> | string
+    ownerId?: StringNullableFilter<"User"> | string | null
+    createdAt?: DateTimeFilter<"User"> | Date | string
+    updatedAt?: DateTimeFilter<"User"> | Date | string
+  }
+
+  export type ProyectoUpsertWithWhereUniqueWithoutOwnerInput = {
+    where: ProyectoWhereUniqueInput
+    update: XOR<ProyectoUpdateWithoutOwnerInput, ProyectoUncheckedUpdateWithoutOwnerInput>
+    create: XOR<ProyectoCreateWithoutOwnerInput, ProyectoUncheckedCreateWithoutOwnerInput>
+  }
+
+  export type ProyectoUpdateWithWhereUniqueWithoutOwnerInput = {
+    where: ProyectoWhereUniqueInput
+    data: XOR<ProyectoUpdateWithoutOwnerInput, ProyectoUncheckedUpdateWithoutOwnerInput>
+  }
+
+  export type ProyectoUpdateManyWithWhereWithoutOwnerInput = {
+    where: ProyectoScalarWhereInput
+    data: XOR<ProyectoUpdateManyMutationInput, ProyectoUncheckedUpdateManyWithoutOwnerInput>
+  }
+
+  export type ProyectoScalarWhereInput = {
+    AND?: ProyectoScalarWhereInput | ProyectoScalarWhereInput[]
+    OR?: ProyectoScalarWhereInput[]
+    NOT?: ProyectoScalarWhereInput | ProyectoScalarWhereInput[]
+    id?: StringFilter<"Proyecto"> | string
+    ownerId?: StringFilter<"Proyecto"> | string
+    identificador?: StringFilter<"Proyecto"> | string
+    identifier_num?: IntFilter<"Proyecto"> | number
+    nombre?: StringFilter<"Proyecto"> | string
+    montoTotal?: FloatFilter<"Proyecto"> | number
+    comisionPct?: FloatFilter<"Proyecto"> | number
+    estado?: StringFilter<"Proyecto"> | string
+    moneda?: StringFilter<"Proyecto"> | string
+    project_approved_at?: DateTimeFilter<"Proyecto"> | Date | string
+    createdAt?: DateTimeFilter<"Proyecto"> | Date | string
+    updatedAt?: DateTimeFilter<"Proyecto"> | Date | string
+  }
+
+  export type UserCreateWithoutProyectosInput = {
+    id?: string
+    email: string
+    password: string
+    name: string
+    role?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner?: UserCreateNestedOneWithoutMiembrosInput
+    miembros?: UserCreateNestedManyWithoutOwnerInput
+  }
+
+  export type UserUncheckedCreateWithoutProyectosInput = {
+    id?: string
+    email: string
+    password: string
+    name: string
+    role?: string
+    ownerId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    miembros?: UserUncheckedCreateNestedManyWithoutOwnerInput
+  }
+
+  export type UserCreateOrConnectWithoutProyectosInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutProyectosInput, UserUncheckedCreateWithoutProyectosInput>
   }
 
   export type FacturacionCreateWithoutProyectoInput = {
@@ -5640,6 +6401,41 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserUpsertWithoutProyectosInput = {
+    update: XOR<UserUpdateWithoutProyectosInput, UserUncheckedUpdateWithoutProyectosInput>
+    create: XOR<UserCreateWithoutProyectosInput, UserUncheckedCreateWithoutProyectosInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutProyectosInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutProyectosInput, UserUncheckedUpdateWithoutProyectosInput>
+  }
+
+  export type UserUpdateWithoutProyectosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneWithoutMiembrosNestedInput
+    miembros?: UserUpdateManyWithoutOwnerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutProyectosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    ownerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    miembros?: UserUncheckedUpdateManyWithoutOwnerNestedInput
+  }
+
   export type FacturacionUpsertWithWhereUniqueWithoutProyectoInput = {
     where: FacturacionWhereUniqueInput
     update: XOR<FacturacionUpdateWithoutProyectoInput, FacturacionUncheckedUpdateWithoutProyectoInput>
@@ -5661,6 +6457,7 @@ export namespace Prisma {
     OR?: FacturacionScalarWhereInput[]
     NOT?: FacturacionScalarWhereInput | FacturacionScalarWhereInput[]
     id?: StringFilter<"Facturacion"> | string
+    ownerId?: StringFilter<"Facturacion"> | string
     proyectoId?: StringFilter<"Facturacion"> | string
     descripcion?: StringFilter<"Facturacion"> | string
     porcentaje?: FloatFilter<"Facturacion"> | number
@@ -5684,10 +6481,12 @@ export namespace Prisma {
     project_approved_at: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutProyectosInput
   }
 
   export type ProyectoUncheckedCreateWithoutFacturacionesInput = {
     id?: string
+    ownerId: string
     identificador: string
     identifier_num: number
     nombre: string
@@ -5728,9 +6527,113 @@ export namespace Prisma {
     project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutProyectosNestedInput
   }
 
   export type ProyectoUncheckedUpdateWithoutFacturacionesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    identificador?: StringFieldUpdateOperationsInput | string
+    identifier_num?: IntFieldUpdateOperationsInput | number
+    nombre?: StringFieldUpdateOperationsInput | string
+    montoTotal?: FloatFieldUpdateOperationsInput | number
+    comisionPct?: FloatFieldUpdateOperationsInput | number
+    estado?: StringFieldUpdateOperationsInput | string
+    moneda?: StringFieldUpdateOperationsInput | string
+    project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserCreateManyOwnerInput = {
+    id?: string
+    email: string
+    password: string
+    name: string
+    role?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProyectoCreateManyOwnerInput = {
+    id?: string
+    identificador: string
+    identifier_num: number
+    nombre: string
+    montoTotal: number
+    comisionPct: number
+    estado?: string
+    moneda?: string
+    project_approved_at: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserUpdateWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    miembros?: UserUpdateManyWithoutOwnerNestedInput
+    proyectos?: ProyectoUpdateManyWithoutOwnerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    miembros?: UserUncheckedUpdateManyWithoutOwnerNestedInput
+    proyectos?: ProyectoUncheckedUpdateManyWithoutOwnerNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProyectoUpdateWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    identificador?: StringFieldUpdateOperationsInput | string
+    identifier_num?: IntFieldUpdateOperationsInput | number
+    nombre?: StringFieldUpdateOperationsInput | string
+    montoTotal?: FloatFieldUpdateOperationsInput | number
+    comisionPct?: FloatFieldUpdateOperationsInput | number
+    estado?: StringFieldUpdateOperationsInput | string
+    moneda?: StringFieldUpdateOperationsInput | string
+    project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    facturaciones?: FacturacionUpdateManyWithoutProyectoNestedInput
+  }
+
+  export type ProyectoUncheckedUpdateWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    identificador?: StringFieldUpdateOperationsInput | string
+    identifier_num?: IntFieldUpdateOperationsInput | number
+    nombre?: StringFieldUpdateOperationsInput | string
+    montoTotal?: FloatFieldUpdateOperationsInput | number
+    comisionPct?: FloatFieldUpdateOperationsInput | number
+    estado?: StringFieldUpdateOperationsInput | string
+    moneda?: StringFieldUpdateOperationsInput | string
+    project_approved_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    facturaciones?: FacturacionUncheckedUpdateManyWithoutProyectoNestedInput
+  }
+
+  export type ProyectoUncheckedUpdateManyWithoutOwnerInput = {
     id?: StringFieldUpdateOperationsInput | string
     identificador?: StringFieldUpdateOperationsInput | string
     identifier_num?: IntFieldUpdateOperationsInput | number

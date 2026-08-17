@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { TRPCError } from "@trpc/server";
@@ -6,59 +7,64 @@ import {
   publicProcedure,
   adminProcedure,
 } from "~/server/api/trpc";
+import { tenantUserFilter } from "~/server/api/tenant";
+import { env } from "~/env";
 
 export const UserRole = {
   ADMIN: "ADMIN",
   GUEST: "GUEST",
 } as const;
 
-export const authRouter = createTRPCRouter({
-  // Verificar si ya existe un admin (para setup inicial)
-  checkSetup: publicProcedure.query(async ({ ctx }) => {
-    const adminCount = await ctx.db.user.count({
-      where: { role: "ADMIN" },
-    });
-    return {
-      needsSetup: adminCount === 0,
-    };
-  }),
+function codigoValido(codigo: string): boolean {
+  const a = Buffer.from(codigo);
+  const b = Buffer.from(env.REGISTRO_CODIGO);
+  // Comparación en tiempo constante para no filtrar el código carácter a carácter.
+  return a.length === b.length && timingSafeEqual(a, b);
+}
 
-  // Crear el primer admin (solo si no existe ninguno)
-  setupAdmin: publicProcedure
+export const authRouter = createTRPCRouter({
+  // Registrar una organización nueva: crea un usuario ADMIN raíz de un tenant
+  // nuevo (ownerId: null) y loguea automáticamente. Requiere código de invitación.
+  registro: publicProcedure
     .input(
       z.object({
+        nombre: z.string().min(1, "Nombre requerido"),
         email: z.string().email("Email inválido"),
         password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-        name: z.string().min(1, "Nombre requerido"),
+        codigo: z.string().min(1, "Código de invitación requerido"),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Verificar que no exista ningún admin
-      const adminCount = await ctx.db.user.count({
-        where: { role: "ADMIN" },
-      });
-
-      if (adminCount > 0) {
+      if (!codigoValido(input.codigo)) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "Ya existe un administrador registrado",
+          message: "Código de invitación inválido",
         });
       }
 
-      // Hash de la contraseña
+      const existing = await ctx.db.user.findUnique({
+        where: { email: input.email },
+      });
+      if (existing) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Ya existe una cuenta con ese email",
+        });
+      }
+
       const hashedPassword = await bcrypt.hash(input.password, 10);
 
-      // Crear el admin
       const user = await ctx.db.user.create({
         data: {
           email: input.email,
           password: hashedPassword,
-          name: input.name,
+          name: input.nombre,
           role: "ADMIN",
+          ownerId: null, // raíz de un tenant nuevo
         },
       });
 
-      // Guardar sesión
+      // Login automático
       ctx.session.user = {
         id: user.id,
         email: user.email,
@@ -66,7 +72,6 @@ export const authRouter = createTRPCRouter({
         role: user.role as "ADMIN" | "GUEST",
       };
       await ctx.session.save();
-      console.log("[AUTH] Session saved for setupAdmin:", ctx.session.user.email);
 
       return {
         user: {
@@ -87,6 +92,8 @@ export const authRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // Global: el email es único en toda la base, el tenant se deriva de la
+      // fila encontrada (ownerId ?? id). No requiere estar scopeado.
       const user = await ctx.db.user.findUnique({
         where: { email: input.email },
       });
@@ -114,7 +121,6 @@ export const authRouter = createTRPCRouter({
         role: user.role as "ADMIN" | "GUEST",
       };
       await ctx.session.save();
-      console.log("[AUTH] Session saved for login:", ctx.session.user.email);
 
       return {
         user: {
@@ -132,15 +138,21 @@ export const authRouter = createTRPCRouter({
     return { success: true };
   }),
 
-  // Obtener usuario actual
+  // Obtener usuario actual (revalida contra la base, no solo la cookie)
   getCurrentUser: publicProcedure.query(async ({ ctx }) => {
-    if (!ctx.user) {
+    const user = await ctx.getAuthUser();
+    if (!user) {
       return null;
     }
-    return ctx.user;
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
   }),
 
-  // Crear usuario guest (solo admin)
+  // Crear usuario dentro del propio tenant (solo admin)
   createUser: adminProcedure
     .input(
       z.object({
@@ -151,7 +163,7 @@ export const authRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Verificar si el email ya existe
+      // El email es único a nivel global (un usuario pertenece a un solo tenant)
       const existing = await ctx.db.user.findUnique({
         where: { email: input.email },
       });
@@ -159,7 +171,7 @@ export const authRouter = createTRPCRouter({
       if (existing) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Ya existe un usuario con ese email",
+          message: "Ya existe una cuenta con ese email",
         });
       }
 
@@ -171,6 +183,7 @@ export const authRouter = createTRPCRouter({
           password: hashedPassword,
           name: input.name,
           role: input.role,
+          ownerId: ctx.tenantId,
         },
       });
 
@@ -184,9 +197,10 @@ export const authRouter = createTRPCRouter({
       };
     }),
 
-  // Listar usuarios (solo admin)
+  // Listar usuarios del tenant (solo admin)
   getUsers: adminProcedure.query(async ({ ctx }) => {
     const users = await ctx.db.user.findMany({
+      where: tenantUserFilter(ctx.tenantId),
       select: {
         id: true,
         email: true,
@@ -199,7 +213,8 @@ export const authRouter = createTRPCRouter({
     return users;
   }),
 
-  // Eliminar usuario (solo admin, no puede eliminarse a sí mismo)
+  // Eliminar usuario del tenant (solo admin, no puede eliminarse a sí mismo
+  // ni al propietario de la cuenta)
   deleteUser: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -210,14 +225,25 @@ export const authRouter = createTRPCRouter({
         });
       }
 
-      await ctx.db.user.delete({
-        where: { id: input.id },
+      if (input.id === ctx.tenantId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "No se puede eliminar al propietario de la cuenta",
+        });
+      }
+
+      const { count } = await ctx.db.user.deleteMany({
+        where: { id: input.id, ownerId: ctx.tenantId },
       });
+
+      if (count === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Usuario no encontrado" });
+      }
 
       return { success: true };
     }),
 
-  // Actualizar contraseña de usuario (solo admin)
+  // Actualizar contraseña de un usuario del tenant (solo admin)
   updateUserPassword: adminProcedure
     .input(
       z.object({
@@ -228,10 +254,14 @@ export const authRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const hashedPassword = await bcrypt.hash(input.password, 10);
 
-      await ctx.db.user.update({
-        where: { id: input.id },
+      const { count } = await ctx.db.user.updateMany({
+        where: { AND: [{ id: input.id }, tenantUserFilter(ctx.tenantId)] },
         data: { password: hashedPassword },
       });
+
+      if (count === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Usuario no encontrado" });
+      }
 
       return { success: true };
     }),

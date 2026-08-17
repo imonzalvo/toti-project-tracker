@@ -14,6 +14,9 @@ export const env = createEnv({
     SESSION_SECRET: z
       .string()
       .min(32, "SESSION_SECRET debe tener al menos 32 caracteres"),
+    REGISTRO_CODIGO: z
+      .string()
+      .min(1, "REGISTRO_CODIGO requerido"),
   },
 
   /**
@@ -33,6 +36,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     SESSION_SECRET: process.env.SESSION_SECRET,
+    REGISTRO_CODIGO: process.env.REGISTRO_CODIGO,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

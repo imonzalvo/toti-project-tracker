@@ -127,12 +127,14 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   name: 'name',
   role: 'role',
+  ownerId: 'ownerId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ProyectoScalarFieldEnum = {
   id: 'id',
+  ownerId: 'ownerId',
   identificador: 'identificador',
   identifier_num: 'identifier_num',
   nombre: 'nombre',
@@ -147,6 +149,7 @@ exports.Prisma.ProyectoScalarFieldEnum = {
 
 exports.Prisma.FacturacionScalarFieldEnum = {
   id: 'id',
+  ownerId: 'ownerId',
   proyectoId: 'proyectoId',
   descripcion: 'descripcion',
   porcentaje: 'porcentaje',

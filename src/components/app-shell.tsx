@@ -3,14 +3,13 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "~/lib/auth-context";
-import { api } from "~/trpc/react";
 import { Sidebar } from "~/components/sidebar";
 import { MobileHeader } from "~/components/mobile-header";
 import { MobileNav } from "~/components/mobile-nav";
 import { CuentaProvider } from "~/lib/cuenta-context";
 
 // Rutas que no requieren autenticación ni sidebar
-const publicRoutes = ["/login", "/setup"];
+const publicRoutes = ["/login", "/registro"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -19,29 +18,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const isPublicRoute = publicRoutes.includes(pathname);
 
-  const { data: setupStatus, isLoading: checkingSetup } =
-    api.auth.checkSetup.useQuery();
-
   useEffect(() => {
-    if (checkingSetup || isLoading) return;
+    if (isLoading) return;
 
     // Lógica de redirección para rutas protegidas
-    if (!isPublicRoute) {
-      if (setupStatus?.needsSetup) {
-        router.push("/setup");
-        return;
-      }
-      if (!user) {
-        router.push("/login");
-        return;
-      }
+    if (!isPublicRoute && !user) {
+      router.push("/login");
+      return;
     }
 
-    // Si está en login/setup pero ya está autenticado, redirigir a home
-    if (isPublicRoute && user && !setupStatus?.needsSetup) {
+    // Si está en login/registro pero ya está autenticado, redirigir a home
+    if (isPublicRoute && user) {
       router.push("/");
     }
-  }, [user, isLoading, setupStatus, checkingSetup, router, pathname, isPublicRoute]);
+  }, [user, isLoading, router, pathname, isPublicRoute]);
 
   // Rutas públicas: mostrar sin sidebar
   if (isPublicRoute) {
@@ -49,7 +39,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   // Mostrar loading mientras se verifica autenticación
-  if (isLoading || checkingSetup) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -60,8 +50,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Si necesita setup o no hay usuario, mostrar loading (se está redirigiendo)
-  if (setupStatus?.needsSetup || !user) {
+  // Si no hay usuario, mostrar loading (se está redirigiendo)
+  if (!user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">

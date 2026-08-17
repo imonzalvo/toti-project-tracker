@@ -19,16 +19,14 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: user, isLoading } = api.auth.getCurrentUser.useQuery();
+  const logoutMutation = api.auth.logout.useMutation();
 
   const logout = () => {
     void (async () => {
       try {
-        await fetch("/api/auth/logout", {
-          method: "POST",
-          credentials: "include",
-        });
-        window.location.href = "/login";
-      } catch {
+        await logoutMutation.mutateAsync();
+      } finally {
+        // Navegación completa (no router.push) para descartar el cache de tRPC.
         window.location.href = "/login";
       }
     })();

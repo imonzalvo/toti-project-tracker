@@ -15,6 +15,7 @@ import { getIronSession } from "iron-session";
 import { db } from "~/server/db";
 import {
   type SessionData,
+  type UserRole,
   sessionOptions,
 } from "~/lib/session";
 
@@ -30,18 +31,46 @@ import {
  *
  * @see https://trpc.io/docs/server/context
  */
+export type AuthUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  ownerId: string | null;
+};
+
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   // Obtener la sesión del usuario desde las cookies
   const cookieStore = await cookies();
   const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
 
-  // Debug: log session state
-  console.log("[AUTH] Session user:", session.user ? session.user.email : "null");
+  // Resuelve el usuario autenticado contra la base (no confiar en el payload de
+  // la cookie para autorización: puede tener hasta 7 días de antigüedad). Se
+  // memoiza porque createTRPCContext corre una sola vez por request HTTP, así
+  // que un batch de tRPC comparte esta misma promesa.
+  let authUserPromise: Promise<AuthUser | null> | undefined;
+  const getAuthUser = (): Promise<AuthUser | null> => {
+    authUserPromise ??= session.user
+      ? db.user
+          .findUnique({
+            where: { id: session.user.id },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              role: true,
+              ownerId: true,
+            },
+          })
+          .then((u) => (u ? { ...u, role: u.role as UserRole } : null))
+      : Promise.resolve(null);
+    return authUserPromise;
+  };
 
   return {
     db,
     session,
-    user: session.user,
+    getAuthUser,
     ...opts,
   };
 };
@@ -121,10 +150,17 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 export const publicProcedure = t.procedure.use(timingMiddleware);
 
 /**
- * Auth middleware - verifica que el usuario esté autenticado
+ * Tenant middleware - verifica que el usuario esté autenticado (revalidando
+ * contra la base) e inyecta ctx.tenantId = ownerId ?? id.
  */
-const authMiddleware = t.middleware(async ({ ctx, next }) => {
-  if (!ctx.user) {
+const tenantMiddleware = t.middleware(async ({ ctx, next }) => {
+  const user = await ctx.getAuthUser();
+
+  if (!user) {
+    // OJO: no llamar ctx.session.destroy() acá. Este middleware también corre
+    // bajo el caller RSC (src/trpc/server.ts), donde mutar cookies durante el
+    // render de un Server Component tira excepción. El cliente redirige a
+    // /login solo (ver src/components/app-shell.tsx) al ver user === null.
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "Debes iniciar sesión para realizar esta acción",
@@ -134,22 +170,26 @@ const authMiddleware = t.middleware(async ({ ctx, next }) => {
   return next({
     ctx: {
       ...ctx,
-      user: ctx.user,
+      user,
+      tenantId: user.ownerId ?? user.id,
     },
   });
 });
 
 /**
- * Admin middleware - verifica que el usuario sea admin
+ * Protected procedure - requiere autenticación. Expone ctx.user y ctx.tenantId
+ * (string no-nullable) a toda procedure que la use.
  */
-const adminMiddleware = t.middleware(async ({ ctx, next }) => {
-  if (!ctx.user) {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "Debes iniciar sesión para realizar esta acción",
-    });
-  }
+export const protectedProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(tenantMiddleware);
 
+/**
+ * Admin procedure - requiere rol de admin dentro del tenant. El middleware se
+ * declara inline (no vía t.middleware() standalone) para que TypeScript infiera
+ * ctx.user/ctx.tenantId ya acumulados por protectedProcedure.
+ */
+export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user.role !== "ADMIN") {
     throw new TRPCError({
       code: "FORBIDDEN",
@@ -157,24 +197,5 @@ const adminMiddleware = t.middleware(async ({ ctx, next }) => {
     });
   }
 
-  return next({
-    ctx: {
-      ...ctx,
-      user: ctx.user,
-    },
-  });
+  return next({ ctx });
 });
-
-/**
- * Protected procedure - requiere autenticación
- */
-export const protectedProcedure = t.procedure
-  .use(timingMiddleware)
-  .use(authMiddleware);
-
-/**
- * Admin procedure - requiere rol de admin
- */
-export const adminProcedure = t.procedure
-  .use(timingMiddleware)
-  .use(adminMiddleware);

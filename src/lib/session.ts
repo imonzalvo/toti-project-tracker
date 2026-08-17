@@ -3,6 +3,10 @@ import { env } from "~/env";
 
 export type UserRole = "ADMIN" | "GUEST";
 
+// Solo `id` se usa para autorización (se revalida contra la base en cada request
+// vía tRPC context). email/name/role son hints de display únicamente: pueden estar
+// desactualizados hasta 7 días (duración de la cookie) y no deben usarse para
+// decidir permisos ni tenant en el servidor.
 export interface SessionUser {
   id: string;
   email: string;

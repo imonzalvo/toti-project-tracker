@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { TRPCClientError } from "@trpc/client";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -17,75 +19,47 @@ import {
 } from "~/components/ui/card";
 import { toast } from "sonner";
 
-const setupSchema = z
+const registroSchema = z
   .object({
-    name: z.string().min(1, "Nombre requerido"),
+    nombre: z.string().min(1, "Nombre requerido"),
     email: z.string().email("Email inválido"),
     password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-    confirmPassword: z.string().min(1, "Confirma tu contraseña"),
+    confirmPassword: z.string().min(1, "Confirmá tu contraseña"),
+    codigo: z.string().min(1, "Código de invitación requerido"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",
     path: ["confirmPassword"],
   });
 
-type SetupFormData = z.infer<typeof setupSchema>;
+type RegistroFormData = z.infer<typeof registroSchema>;
 
-export default function SetupPage() {
+export default function RegistroPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const { data: setupStatus, isLoading } = api.auth.checkSetup.useQuery();
+  const registroMutation = api.auth.registro.useMutation();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SetupFormData>({
-    resolver: zodResolver(setupSchema),
+  } = useForm<RegistroFormData>({
+    resolver: zodResolver(registroSchema),
   });
 
-  const onSubmit = async (data: SetupFormData) => {
+  const onSubmit = async (data: RegistroFormData) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/auth/setup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-        }),
-        credentials: "include",
-      });
-
-      const result = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        toast.error(result.error ?? "Error al crear administrador");
-        setIsSubmitting(false);
-        return;
-      }
-
-      toast.success("¡Administrador creado exitosamente!");
+      await registroMutation.mutateAsync(data);
+      toast.success("¡Cuenta creada!");
+      // Navegación completa (no router.push) para descartar el cache de tRPC.
       window.location.href = "/";
-    } catch {
-      toast.error("Error al conectar con el servidor");
+    } catch (error) {
+      const message =
+        error instanceof TRPCClientError ? error.message : "Error al conectar con el servidor";
+      toast.error(message);
       setIsSubmitting(false);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Cargando...</div>
-      </div>
-    );
-  }
-
-  if (!setupStatus?.needsSetup) {
-    window.location.href = "/login";
-    return null;
-  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
@@ -94,23 +68,24 @@ export default function SetupPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
             <span className="text-2xl font-bold text-primary-foreground">PT</span>
           </div>
-          <CardTitle className="text-2xl font-bold">Configuración Inicial</CardTitle>
+          <CardTitle className="text-2xl font-bold">Crear Cuenta</CardTitle>
           <CardDescription>
-            Crea tu cuenta de administrador para comenzar a usar Project Tracker
+            Registrá tu organización en Project Tracker
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nombre</Label>
+              <Label htmlFor="nombre">Nombre</Label>
               <Input
-                id="name"
+                id="nombre"
+                type="text"
                 placeholder="Tu nombre"
-                {...register("name")}
-                className={errors.name ? "border-destructive" : ""}
+                {...register("nombre")}
+                className={errors.nombre ? "border-destructive" : ""}
               />
-              {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
+              {errors.nombre && (
+                <p className="text-sm text-destructive">{errors.nombre.message}</p>
               )}
             </div>
 
@@ -119,7 +94,7 @@ export default function SetupPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@ejemplo.com"
+                placeholder="tu@email.com"
                 {...register("email")}
                 className={errors.email ? "border-destructive" : ""}
               />
@@ -133,7 +108,7 @@ export default function SetupPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Al menos 6 caracteres"
                 {...register("password")}
                 className={errors.password ? "border-destructive" : ""}
               />
@@ -147,21 +122,40 @@ export default function SetupPage() {
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Repite tu contraseña"
+                placeholder="Repetí tu contraseña"
                 {...register("confirmPassword")}
                 className={errors.confirmPassword ? "border-destructive" : ""}
               />
               {errors.confirmPassword && (
-                <p className="text-sm text-destructive">
-                  {errors.confirmPassword.message}
-                </p>
+                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="codigo">Código de invitación</Label>
+              <Input
+                id="codigo"
+                type="text"
+                placeholder="Código provisto por el administrador"
+                {...register("codigo")}
+                className={errors.codigo ? "border-destructive" : ""}
+              />
+              {errors.codigo && (
+                <p className="text-sm text-destructive">{errors.codigo.message}</p>
               )}
             </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Creando cuenta..." : "Crear cuenta de administrador"}
+              {isSubmitting ? "Creando cuenta..." : "Crear Cuenta"}
             </Button>
           </form>
+
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            ¿Ya tenés cuenta?{" "}
+            <Link href="/login" className="font-medium text-primary hover:underline">
+              Iniciá sesión
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>
