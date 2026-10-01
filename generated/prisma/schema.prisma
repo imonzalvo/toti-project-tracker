@@ -87,6 +87,7 @@ model Facturacion {
   fechaFacturacion DateTime
   estado           String    @default("EMITIDA") // EMITIDA, COBRADA
   fechaCobro       DateTime?
+  comentario       String? // Texto libre, puede tener saltos de línea
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 

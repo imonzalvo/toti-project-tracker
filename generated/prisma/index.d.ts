@@ -3540,6 +3540,7 @@ export namespace Prisma {
     fechaFacturacion: Date | null
     estado: string | null
     fechaCobro: Date | null
+    comentario: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3554,6 +3555,7 @@ export namespace Prisma {
     fechaFacturacion: Date | null
     estado: string | null
     fechaCobro: Date | null
+    comentario: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3568,6 +3570,7 @@ export namespace Prisma {
     fechaFacturacion: number
     estado: number
     fechaCobro: number
+    comentario: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3594,6 +3597,7 @@ export namespace Prisma {
     fechaFacturacion?: true
     estado?: true
     fechaCobro?: true
+    comentario?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3608,6 +3612,7 @@ export namespace Prisma {
     fechaFacturacion?: true
     estado?: true
     fechaCobro?: true
+    comentario?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3622,6 +3627,7 @@ export namespace Prisma {
     fechaFacturacion?: true
     estado?: true
     fechaCobro?: true
+    comentario?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3723,6 +3729,7 @@ export namespace Prisma {
     fechaFacturacion: Date
     estado: string
     fechaCobro: Date | null
+    comentario: string | null
     createdAt: Date
     updatedAt: Date
     _count: FacturacionCountAggregateOutputType | null
@@ -3756,6 +3763,7 @@ export namespace Prisma {
     fechaFacturacion?: boolean
     estado?: boolean
     fechaCobro?: boolean
+    comentario?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     proyecto?: boolean | ProyectoDefaultArgs<ExtArgs>
@@ -3771,6 +3779,7 @@ export namespace Prisma {
     fechaFacturacion?: boolean
     estado?: boolean
     fechaCobro?: boolean
+    comentario?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     proyecto?: boolean | ProyectoDefaultArgs<ExtArgs>
@@ -3786,6 +3795,7 @@ export namespace Prisma {
     fechaFacturacion?: boolean
     estado?: boolean
     fechaCobro?: boolean
+    comentario?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     proyecto?: boolean | ProyectoDefaultArgs<ExtArgs>
@@ -3801,11 +3811,12 @@ export namespace Prisma {
     fechaFacturacion?: boolean
     estado?: boolean
     fechaCobro?: boolean
+    comentario?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type FacturacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "proyectoId" | "descripcion" | "porcentaje" | "monto" | "fechaFacturacion" | "estado" | "fechaCobro" | "createdAt" | "updatedAt", ExtArgs["result"]["facturacion"]>
+  export type FacturacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "proyectoId" | "descripcion" | "porcentaje" | "monto" | "fechaFacturacion" | "estado" | "fechaCobro" | "comentario" | "createdAt" | "updatedAt", ExtArgs["result"]["facturacion"]>
   export type FacturacionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     proyecto?: boolean | ProyectoDefaultArgs<ExtArgs>
   }
@@ -3831,6 +3842,7 @@ export namespace Prisma {
       fechaFacturacion: Date
       estado: string
       fechaCobro: Date | null
+      comentario: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["facturacion"]>
@@ -4266,6 +4278,7 @@ export namespace Prisma {
     readonly fechaFacturacion: FieldRef<"Facturacion", 'DateTime'>
     readonly estado: FieldRef<"Facturacion", 'String'>
     readonly fechaCobro: FieldRef<"Facturacion", 'DateTime'>
+    readonly comentario: FieldRef<"Facturacion", 'String'>
     readonly createdAt: FieldRef<"Facturacion", 'DateTime'>
     readonly updatedAt: FieldRef<"Facturacion", 'DateTime'>
   }
@@ -4738,6 +4751,7 @@ export namespace Prisma {
     fechaFacturacion: 'fechaFacturacion',
     estado: 'estado',
     fechaCobro: 'fechaCobro',
+    comentario: 'comentario',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -5020,6 +5034,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeFilter<"Facturacion"> | Date | string
     estado?: StringFilter<"Facturacion"> | string
     fechaCobro?: DateTimeNullableFilter<"Facturacion"> | Date | string | null
+    comentario?: StringNullableFilter<"Facturacion"> | string | null
     createdAt?: DateTimeFilter<"Facturacion"> | Date | string
     updatedAt?: DateTimeFilter<"Facturacion"> | Date | string
     proyecto?: XOR<ProyectoScalarRelationFilter, ProyectoWhereInput>
@@ -5035,6 +5050,7 @@ export namespace Prisma {
     fechaFacturacion?: SortOrder
     estado?: SortOrder
     fechaCobro?: SortOrderInput | SortOrder
+    comentario?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     proyecto?: ProyectoOrderByWithRelationInput
@@ -5053,6 +5069,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeFilter<"Facturacion"> | Date | string
     estado?: StringFilter<"Facturacion"> | string
     fechaCobro?: DateTimeNullableFilter<"Facturacion"> | Date | string | null
+    comentario?: StringNullableFilter<"Facturacion"> | string | null
     createdAt?: DateTimeFilter<"Facturacion"> | Date | string
     updatedAt?: DateTimeFilter<"Facturacion"> | Date | string
     proyecto?: XOR<ProyectoScalarRelationFilter, ProyectoWhereInput>
@@ -5068,6 +5085,7 @@ export namespace Prisma {
     fechaFacturacion?: SortOrder
     estado?: SortOrder
     fechaCobro?: SortOrderInput | SortOrder
+    comentario?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: FacturacionCountOrderByAggregateInput
@@ -5090,6 +5108,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeWithAggregatesFilter<"Facturacion"> | Date | string
     estado?: StringWithAggregatesFilter<"Facturacion"> | string
     fechaCobro?: DateTimeNullableWithAggregatesFilter<"Facturacion"> | Date | string | null
+    comentario?: StringNullableWithAggregatesFilter<"Facturacion"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Facturacion"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Facturacion"> | Date | string
   }
@@ -5294,6 +5313,7 @@ export namespace Prisma {
     fechaFacturacion: Date | string
     estado?: string
     fechaCobro?: Date | string | null
+    comentario?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     proyecto: ProyectoCreateNestedOneWithoutFacturacionesInput
@@ -5309,6 +5329,7 @@ export namespace Prisma {
     fechaFacturacion: Date | string
     estado?: string
     fechaCobro?: Date | string | null
+    comentario?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5321,6 +5342,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeFieldUpdateOperationsInput | Date | string
     estado?: StringFieldUpdateOperationsInput | string
     fechaCobro?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comentario?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     proyecto?: ProyectoUpdateOneRequiredWithoutFacturacionesNestedInput
@@ -5336,6 +5358,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeFieldUpdateOperationsInput | Date | string
     estado?: StringFieldUpdateOperationsInput | string
     fechaCobro?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comentario?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5350,6 +5373,7 @@ export namespace Prisma {
     fechaFacturacion: Date | string
     estado?: string
     fechaCobro?: Date | string | null
+    comentario?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5362,6 +5386,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeFieldUpdateOperationsInput | Date | string
     estado?: StringFieldUpdateOperationsInput | string
     fechaCobro?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comentario?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5376,6 +5401,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeFieldUpdateOperationsInput | Date | string
     estado?: StringFieldUpdateOperationsInput | string
     fechaCobro?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comentario?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5701,6 +5727,7 @@ export namespace Prisma {
     fechaFacturacion?: SortOrder
     estado?: SortOrder
     fechaCobro?: SortOrder
+    comentario?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5720,6 +5747,7 @@ export namespace Prisma {
     fechaFacturacion?: SortOrder
     estado?: SortOrder
     fechaCobro?: SortOrder
+    comentario?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5734,6 +5762,7 @@ export namespace Prisma {
     fechaFacturacion?: SortOrder
     estado?: SortOrder
     fechaCobro?: SortOrder
+    comentario?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -6375,6 +6404,7 @@ export namespace Prisma {
     fechaFacturacion: Date | string
     estado?: string
     fechaCobro?: Date | string | null
+    comentario?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -6387,6 +6417,7 @@ export namespace Prisma {
     fechaFacturacion: Date | string
     estado?: string
     fechaCobro?: Date | string | null
+    comentario?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -6465,6 +6496,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeFilter<"Facturacion"> | Date | string
     estado?: StringFilter<"Facturacion"> | string
     fechaCobro?: DateTimeNullableFilter<"Facturacion"> | Date | string | null
+    comentario?: StringNullableFilter<"Facturacion"> | string | null
     createdAt?: DateTimeFilter<"Facturacion"> | Date | string
     updatedAt?: DateTimeFilter<"Facturacion"> | Date | string
   }
@@ -6655,6 +6687,7 @@ export namespace Prisma {
     fechaFacturacion: Date | string
     estado?: string
     fechaCobro?: Date | string | null
+    comentario?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -6667,6 +6700,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeFieldUpdateOperationsInput | Date | string
     estado?: StringFieldUpdateOperationsInput | string
     fechaCobro?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comentario?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6679,6 +6713,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeFieldUpdateOperationsInput | Date | string
     estado?: StringFieldUpdateOperationsInput | string
     fechaCobro?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comentario?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6691,6 +6726,7 @@ export namespace Prisma {
     fechaFacturacion?: DateTimeFieldUpdateOperationsInput | Date | string
     estado?: StringFieldUpdateOperationsInput | string
     fechaCobro?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comentario?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

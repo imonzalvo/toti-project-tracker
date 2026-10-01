@@ -26,6 +26,9 @@ import {
   AccordionTrigger,
 } from "~/components/ui/accordion";
 import { Separator } from "~/components/ui/separator";
+import { Button } from "~/components/ui/button";
+import { toast } from "sonner";
+import { exportCobrosTrimestre } from "~/lib/export-cobros";
 import { api } from "~/trpc/react";
 import {
   formatCurrency,
@@ -35,7 +38,14 @@ import {
   getTipoFacturacionLabel,
 } from "~/lib/formatters";
 import { useCuenta } from "~/lib/cuenta-context";
-import { Calculator, Wallet, Building2, ExternalLink } from "lucide-react";
+import {
+  Calculator,
+  Wallet,
+  Building2,
+  ExternalLink,
+  Download,
+  Loader2,
+} from "lucide-react";
 
 interface CobrosTrimesterProps {
   initialYear: number;
@@ -64,10 +74,23 @@ export function CobrosTrimestre({
     { enabled: !!year && !!quarter }
   );
 
+  const [exporting, setExporting] = useState(false);
+  const handleExport = async () => {
+    if (!cobros) return;
+    setExporting(true);
+    try {
+      await exportCobrosTrimestre(cobros, moneda);
+    } catch {
+      toast.error("Error al exportar la planilla");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Period Selector */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         <label className="text-sm font-medium text-muted-foreground">
           Periodo:
         </label>
@@ -83,6 +106,19 @@ export function CobrosTrimestre({
             ))}
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          onClick={() => void handleExport()}
+          disabled={!cobros || cobros.proyectos.length === 0 || exporting}
+          className="sm:ml-auto"
+        >
+          {exporting ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="mr-2 h-4 w-4" />
+          )}
+          Exportar a Excel
+        </Button>
       </div>
 
       {/* Summary Cards */}

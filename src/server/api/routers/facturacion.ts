@@ -347,6 +347,24 @@ export const facturacionRouter = createTRPCRouter({
         .catch((e: unknown) => rethrowAsNotFound(e, "Facturación no encontrada"));
     }),
 
+  // Editar comentario de una facturación (solo admin). Vacío => se borra.
+  updateComentario: adminProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        comentario: z.string().max(5000, "Máximo 5000 caracteres"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const comentario = input.comentario.trim();
+      return ctx.db.facturacion
+        .update({
+          where: { id: input.id, ownerId: ctx.tenantId },
+          data: { comentario: comentario === "" ? null : comentario },
+        })
+        .catch((e: unknown) => rethrowAsNotFound(e, "Facturación no encontrada"));
+    }),
+
   // Eliminar facturación (solo admin)
   delete: adminProcedure
     .input(z.object({ id: z.string() }))

@@ -32,7 +32,16 @@ import {
   getEstadoFacturacionLabel,
 } from "~/lib/formatters";
 import { useAuth } from "~/lib/auth-context";
-import { FileText, CheckCircle2, Trash2, Loader2, XCircle, Pencil } from "lucide-react";
+import {
+  FileText,
+  CheckCircle2,
+  Trash2,
+  Loader2,
+  XCircle,
+  Pencil,
+  MessageSquarePlus,
+} from "lucide-react";
+import { ComentarioDialog, type FacturaComentario } from "./comentario-dialog";
 
 interface FacturacionesTableProps {
   proyectoId: string;
@@ -58,6 +67,9 @@ export function FacturacionesTable({ proyectoId }: FacturacionesTableProps) {
     porcentajeActual: number;
   }>({ open: false, facturacionId: null, descripcion: "", porcentajeActual: 0 });
   const [nuevoPorcentaje, setNuevoPorcentaje] = useState("");
+
+  const [comentarioFactura, setComentarioFactura] =
+    useState<FacturaComentario | null>(null);
 
   const marcarCobradaMutation = api.facturacion.marcarCobrada.useMutation({
     onSuccess: () => {
@@ -227,6 +239,17 @@ export function FacturacionesTable({ proyectoId }: FacturacionesTableProps) {
                     </p>
                   </div>
                 </div>
+                {/* Comentario Mobile */}
+                {factura.comentario && (
+                  <button
+                    type="button"
+                    onClick={() => setComentarioFactura(factura)}
+                    className="mt-2 line-clamp-2 w-full text-left text-xs whitespace-pre-line break-words text-muted-foreground hover:text-foreground"
+                    title="Ver comentario completo"
+                  >
+                    {factura.comentario}
+                  </button>
+                )}
                 {/* Acciones Mobile */}
                 {isAdmin && (
                   <div className="mt-3 flex items-center gap-2 border-t pt-3">
@@ -263,6 +286,17 @@ export function FacturacionesTable({ proyectoId }: FacturacionesTableProps) {
                         Revertir
                       </Button>
                     )}
+                    {!factura.comentario && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setComentarioFactura(factura)}
+                        className="h-8 w-8"
+                        title="Agregar comentario"
+                      >
+                        <MessageSquarePlus className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="icon"
@@ -297,6 +331,7 @@ export function FacturacionesTable({ proyectoId }: FacturacionesTableProps) {
                 <TableHead>Fecha Facturación</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Fecha Cobro</TableHead>
+                <TableHead>Comentario</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -333,6 +368,31 @@ export function FacturacionesTable({ proyectoId }: FacturacionesTableProps) {
                     {factura.fechaCobro
                       ? formatDate(factura.fechaCobro)
                       : "—"}
+                  </TableCell>
+                  <TableCell className="max-w-56">
+                    {factura.comentario ? (
+                      <button
+                        type="button"
+                        onClick={() => setComentarioFactura(factura)}
+                        className="block w-full truncate text-left text-sm text-muted-foreground hover:text-foreground hover:underline"
+                        title="Ver comentario completo"
+                      >
+                        {factura.comentario.split("\n")[0]}
+                        {factura.comentario.includes("\n") && " …"}
+                      </button>
+                    ) : isAdmin ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setComentarioFactura(factura)}
+                        className="h-7 gap-1 px-2 text-muted-foreground"
+                      >
+                        <MessageSquarePlus className="h-4 w-4" />
+                        Agregar
+                      </Button>
+                    ) : (
+                      "—"
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
@@ -407,6 +467,13 @@ export function FacturacionesTable({ proyectoId }: FacturacionesTableProps) {
           </Table>
         </CardContent>
       </Card>
+
+      <ComentarioDialog
+        proyectoId={proyectoId}
+        factura={comentarioFactura}
+        isAdmin={isAdmin}
+        onClose={() => setComentarioFactura(null)}
+      />
 
       {/* Dialog para marcar como cobrada */}
       <Dialog

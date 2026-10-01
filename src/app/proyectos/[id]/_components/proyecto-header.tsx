@@ -52,6 +52,7 @@ export function ProyectoHeader({ id }: ProyectoHeaderProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [editData, setEditData] = useState({
     nombre: "",
+    montoTotal: "",
     comisionPct: "",
     project_approved_at: "",
   });
@@ -60,9 +61,9 @@ export function ProyectoHeader({ id }: ProyectoHeaderProps) {
     onSuccess: () => {
       toast.success("Proyecto actualizado");
       setEditOpen(false);
-      void utils.proyecto.getById.invalidate({ id });
-      void utils.proyecto.getAll.invalidate();
-      void utils.proyecto.getStats.invalidate();
+      void utils.proyecto.invalidate();
+      // Un cambio de monto recalcula los montos de las facturas
+      void utils.facturacion.invalidate();
     },
     onError: (error) => {
       toast.error(error.message || "Error al actualizar");
@@ -108,6 +109,7 @@ export function ProyectoHeader({ id }: ProyectoHeaderProps) {
     if (!proyecto) return;
     setEditData({
       nombre: proyecto.nombre,
+      montoTotal: proyecto.montoTotal.toString(),
       comisionPct: proyecto.comisionPct.toString(),
       project_approved_at: proyecto.project_approved_at
         .toISOString()
@@ -123,9 +125,15 @@ export function ProyectoHeader({ id }: ProyectoHeaderProps) {
       toast.error("La comisión debe estar entre 0 y 100");
       return;
     }
+    const montoTotal = parseFloat(editData.montoTotal);
+    if (isNaN(montoTotal) || montoTotal <= 0) {
+      toast.error("El monto debe ser un número positivo");
+      return;
+    }
     updateMutation.mutate({
       id,
       nombre: editData.nombre.trim(),
+      ...(montoTotal !== proyecto?.montoTotal && { montoTotal }),
       comisionPct,
       project_approved_at: editData.project_approved_at
         ? new Date(editData.project_approved_at)
@@ -153,6 +161,28 @@ export function ProyectoHeader({ id }: ProyectoHeaderProps) {
                   }
                   required
                 />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-monto">Monto Total</Label>
+                <Input
+                  id="edit-monto"
+                  type="number"
+                  value={editData.montoTotal}
+                  onChange={(e) =>
+                    setEditData((prev) => ({ ...prev, montoTotal: e.target.value }))
+                  }
+                  required
+                  min="0.01"
+                  step="0.01"
+                />
+                {proyecto.facturaciones.length > 0 &&
+                  parseFloat(editData.montoTotal) !== proyecto.montoTotal && (
+                    <p className="text-sm text-amber-600">
+                      Se recalcularán los montos de {proyecto.facturaciones.length}{" "}
+                      {proyecto.facturaciones.length === 1 ? "factura" : "facturas"}{" "}
+                      manteniendo su porcentaje.
+                    </p>
+                  )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-comision">Porcentaje de Comisión (%)</Label>

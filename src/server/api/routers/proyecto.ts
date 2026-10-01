@@ -236,6 +236,7 @@ export const proyectoRouter = createTRPCRouter({
       z.object({
         id: z.string(),
         nombre: z.string().min(1).optional(),
+        montoTotal: z.number().positive("El monto debe ser positivo").optional(),
         comisionPct: z.number().min(0).max(100).optional(),
         estado: z
           .enum(["NOT_STARTED", "IN_PROGRESS", "FINISHED"])
@@ -245,12 +246,41 @@ export const proyectoRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
-      return ctx.db.proyecto
-        .update({
-          where: { id, ownerId: ctx.tenantId },
-          data,
-        })
-        .catch((e: unknown) => rethrowAsNotFound(e, "Proyecto no encontrado"));
+      const { montoTotal } = data;
+
+      if (montoTotal === undefined) {
+        return ctx.db.proyecto
+          .update({
+            where: { id, ownerId: ctx.tenantId },
+            data,
+          })
+          .catch((e: unknown) => rethrowAsNotFound(e, "Proyecto no encontrado"));
+      }
+
+      // Cambio de monto: todas las facturas (emitidas y cobradas) mantienen su
+      // porcentaje y se recalcula su monto, de forma atómica con el proyecto.
+      return ctx.db.$transaction(async (tx) => {
+        const proyecto = await tx.proyecto
+          .update({
+            where: { id, ownerId: ctx.tenantId },
+            data,
+          })
+          .catch((e: unknown) => rethrowAsNotFound(e, "Proyecto no encontrado"));
+
+        const facturaciones = await tx.facturacion.findMany({
+          where: { proyectoId: id, ownerId: ctx.tenantId },
+          select: { id: true, porcentaje: true },
+        });
+
+        for (const f of facturaciones) {
+          await tx.facturacion.update({
+            where: { id: f.id, ownerId: ctx.tenantId },
+            data: { monto: (montoTotal * f.porcentaje) / 100 },
+          });
+        }
+
+        return proyecto;
+      });
     }),
 
   // Eliminar proyecto (solo admin)

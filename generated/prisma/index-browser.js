@@ -157,6 +157,7 @@ exports.Prisma.FacturacionScalarFieldEnum = {
   fechaFacturacion: 'fechaFacturacion',
   estado: 'estado',
   fechaCobro: 'fechaCobro',
+  comentario: 'comentario',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
